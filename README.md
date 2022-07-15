@@ -1,5 +1,12 @@
 ISSUE: When PersonToken's breed() function is called (in truffle tests) then it fails at 
-different points under different 'truffle test' runs.
+different points under different 'truffle test' runs.  For example, under contract tests 02,
+the breed function sometimes passes and other times fails - whilst another run of truffle test
+may result in all tests passing.
+
+Note: The contract tests 03 use breed repeatidly in its before block setup - in order to set up a 
+family tree of person tokens (in the before blocks).  Likewise breed fails sometimes straight away,
+on other runs several 'before blocks' into the setup.
+(Therefore it never gets to compelete setup, required to execute the test cases).
 
 
 TESTS FAIL AT DIFFERENT POINTS (UNDER GANACHE V7.3.2)
