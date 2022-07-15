@@ -1,0 +1,10 @@
+*/.DS_Store
+.DS_Store
+build/
+node_modules/
+secrets.json
+
+# OpenZeppelin
+.openzeppelin/unknown-*.json
+.openzeppelin/dev-*.json
+.openzeppelin/.session
