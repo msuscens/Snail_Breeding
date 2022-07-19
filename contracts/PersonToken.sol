@@ -76,7 +76,7 @@ contract PersonToken is
         external
         whenNotPaused
     {
-        require(personAId != personBId, "breed: Single mate!");
+        require(personAId != personBId, "breed: With self!");
         require(_isApprovedOrOwner(msg.sender, personAId), "breed: mateA is not present!");
         require(_isApprovedOrOwner(msg.sender, personBId), "breed: mateB is not present!");
         
