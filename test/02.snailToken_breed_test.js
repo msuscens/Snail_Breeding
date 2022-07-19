@@ -73,7 +73,7 @@ contract("02 SnailToken - Two snails breed", async accounts => {
     const C_SNAIL_ID = 2 //Owner accounts[0]
 
 
-    describe("Breed YoungAdults: Both mates must be present", () => {
+    describe("Breed snails: Both mates must be present", () => {
 
         let snapshotId
         beforeEach("Save Initial Setup State (of blockchain)", async() => {
