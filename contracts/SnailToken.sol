@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./IPersonToken.sol";
+import "./ISnailToken.sol";
 
 bytes4 constant _ERC721_RECEIVED =
     bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
@@ -21,24 +21,24 @@ uint256 constant _FERTILITY_BASE_PERCENTAGE = 80;
 uint256 constant _MINIMUM_FERTILITY_PERCENTAGE = 5;
 
 
-contract PersonToken is
+contract SnailToken is
     Initializable,
     ERC721Upgradeable,
     ERC721EnumerableUpgradeable,
     ERC721HolderUpgradeable,
     PausableUpgradeable,
     OwnableUpgradeable,
-    IPersonToken
+    ISnailToken
 {
-    // Mapping from person's tokenId => Person record 
-    mapping (uint256 => Person) private _persons;
-    uint256 private _personIdCounter;
+    // Mapping from snail's tokenId => Snail record 
+    mapping (uint256 => Snail) private _snails;
+    uint256 private _snailIdCounter;
 
 
 // Constructor
     // Initializer for the upgradeable contract (instead of constructor) 
     // that can only be executed once (that must be done upon deployment)
-    function init_PersonToken(
+    function init_SnailToken(
         string memory tokenName, 
         string memory tokenSymbol
     )
@@ -55,7 +55,7 @@ contract PersonToken is
 
 // External functions
 
-    function mintPersonsTo(
+    function mintSnailsTo(
         address owner,
         Conception[] memory fromConceptions
     )
@@ -64,60 +64,60 @@ contract PersonToken is
         onlyOwner
         returns (uint256[] memory newBornIds)
     {
-        require(owner != address(0), "mintPersonsTo: 0 address!");
-        require(fromConceptions.length > 0, "mintPersonsTo: No conception!");
+        require(owner != address(0), "mintSnailsTo: 0 address!");
+        require(fromConceptions.length > 0, "mintSnailsTo: No conception!");
 
-        newBornIds = _mintPersonsTo(owner, fromConceptions);
+        newBornIds = _mintSnailsTo(owner, fromConceptions);
     }
 
 
-    function breed(uint256 personAId, uint256 personBId)
+    function breed(uint256 snailAId, uint256 snailBId)
         override
         external
         whenNotPaused
     {
-        require(personAId != personBId, "breed: With self!");
-        require(_isApprovedOrOwner(msg.sender, personAId), "breed: mateA is not present!");
-        require(_isApprovedOrOwner(msg.sender, personBId), "breed: mateB is not present!");
+        require(snailAId != snailBId, "breed: With self!");
+        require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
+        require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
         
-        // Determine which of the two mates conceive and so will have an baby.
+        // Determine which of the two mates conceive and so will give birth to a new-born snail.
         // NB as mates are haermaphrodites, they both may conceive (or only 1 of them or neither)
-        (Conception[] memory conceptions,,,,,,,) = _whoConceives(personAId, personBId);
+        (Conception[] memory conceptions,,,,,,,) = _whoConceives(snailAId, snailBId);
 
-        // Mint any new-born babies (persons)
+        // Mint any new-born snails
         if (conceptions.length > 0) {
 
-            uint256[] memory newBornIds = _mintPersonsTo(msg.sender, conceptions);
+            uint256[] memory newBornIds = _mintSnailsTo(msg.sender, conceptions);
 
             require(
                 newBornIds.length == conceptions.length,
                 "breedIE: conceptions!=newBorns!"
             );
-            emit BabiesBorn(msg.sender, newBornIds, conceptions);
+            emit SnailsBorn(msg.sender, newBornIds, conceptions);
         }
     }
 
 
-    function getPerson(uint256 personId)
+    function getSnail(uint256 snailId)
         override
         external
         view
-        returns (Person memory)
+        returns (Snail memory)
 
     {
-        require(_exists(personId), "getPerson: No such personId!");
-        return (_persons[personId]);
+        require(_exists(snailId), "getSnail: No such snailId!");
+        return (_snails[snailId]);
     }
 
 
-    function getRelationship(uint256 personId, uint256 toPersonId)
+    function getRelationship(uint256 snailId, uint256 toSnailId)
         external
         view
         returns (Relationship relationship)
     {
-        require(_exists(personId), "getRelationship: No person!");
-        require(_exists(toPersonId), "getRelationship: No toPerson!");
-        return (_getRelationship(personId, toPersonId));
+        require(_exists(snailId), "getRelationship: No snail!");
+        require(_exists(toSnailId), "getRelationship: No toSnail!");
+        return (_getRelationship(snailId, toSnailId));
     }
 
 
@@ -171,18 +171,18 @@ contract PersonToken is
 
 // Private functions
 
-    function _mintPersonsTo(
+    function _mintSnailsTo(
         address owner,
         Conception[] memory fromConceptions
     )
         private
         returns (uint256[] memory newBornIds)
     {
-        //Mint each person
+        //Mint each snail
         newBornIds = new uint256[](fromConceptions.length);
         for (uint8 i=0; i < fromConceptions.length; i++) {
 
-            Person memory person = Person(
+            Snail memory snail = Snail(
                 {
                     age: Age(
                         {
@@ -194,9 +194,9 @@ contract PersonToken is
                     dadId: fromConceptions[i].dadId
                 }
             );
-            newBornIds[i] = _personIdCounter;
-            _persons[_personIdCounter] = person;
-            _personIdCounter++;
+            newBornIds[i] = _snailIdCounter;
+            _snails[_snailIdCounter] = snail;
+            _snailIdCounter++;
 
             _safeMint(owner, newBornIds[i]);
         }
@@ -262,12 +262,12 @@ contract PersonToken is
         require(idMateA != idMateB, "_whoIsFertilised: Only 1x Mate!");
 
         fertilityPercentage = _calculateFertility(
-            _persons[idMateA].age.generation,
-            _persons[idMateB].age.generation
+            _snails[idMateA].age.generation,
+            _snails[idMateB].age.generation
         );
 
         //Are either (or both) mates fertilised?
-        seed = blockTime + idMateA + idMateB + _personIdCounter;
+        seed = blockTime + idMateA + idMateB + _snailIdCounter;
         pseudoRandom =_calcPseudoRandom(4, seed); //2x 2-digit numbers 
         uint256 random = pseudoRandom;
 
@@ -296,9 +296,9 @@ contract PersonToken is
         conceptions = new Conception[](numFertilised);
 
         uint256 newGeneration =
-            _persons[mateAId].age.generation > _persons[mateBId].age.generation ?
-                _persons[mateAId].age.generation+1 :
-                _persons[mateBId].age.generation+1;
+            _snails[mateAId].age.generation > _snails[mateBId].age.generation ?
+                _snails[mateAId].age.generation+1 :
+                _snails[mateBId].age.generation+1;
 
         uint8 index;
         if (mateAFertilised == true) {
@@ -363,19 +363,19 @@ contract PersonToken is
 
 
     // function _isExPartner(
-    //     uint256 personId, 
-    //     uint256 toPersonId
+    //     uint256 snailId, 
+    //     uint256 toSnailId
     // )
     //     private
     //     view
     //     returns (bool)
     // {
-    //     uint256 nextId = (personId > toPersonId ) ? personId: toPersonId;
+    //     uint256 nextId = (snailId > toSnailId ) ? snailId: toSnailId;
 
-    //     while (_persons[nextId].dnaId != 0) { // there's another person
+    //     while (_snails[nextId].dnaId != 0) { // there's another snail
 
-    //         if (_persons[nextId].mumId == personId && _persons[nextId].dadId == toPersonId ||
-    //             _persons[nextId].mumId == toPersonId && _persons[nextId].dadId == personId)
+    //         if (_snails[nextId].mumId == snailId && _snails[nextId].dadId == toSnailId ||
+    //             _snails[nextId].mumId == toSnailId && _snails[nextId].dadId == snailId)
     //             return true;
     //         nextId++;
     //     }
@@ -384,240 +384,240 @@ contract PersonToken is
 
 
     function _isMother(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isGen0(toPersonId)) return false;
-        if (_persons[toPersonId].mumId == personId)
+        if (_isGen0(toSnailId)) return false;
+        if (_snails[toSnailId].mumId == snailId)
             return true;
         return false;
     }
 
 
     function _isFather(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isGen0(toPersonId)) return false;
-        if (_persons[toPersonId].dadId == personId)
+        if (_isGen0(toSnailId)) return false;
+        if (_snails[toSnailId].dadId == snailId)
             return true;
         return false;
     }
 
 
     function _isChild(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isMother(toPersonId, personId) ||
-            _isFather(toPersonId, personId))
+        if (_isMother(toSnailId, snailId) ||
+            _isFather(toSnailId, snailId))
             return true;
         return false;
     }
 
 
     function _isFullSibling(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isGen0(personId) || _isGen0(toPersonId)) return false;
+        if (_isGen0(snailId) || _isGen0(toSnailId)) return false;
 
-        if ((_persons[personId].mumId == _persons[toPersonId].mumId && //Same mum
-            _persons[personId].dadId == _persons[toPersonId].dadId) || //Same dad
-            (_persons[personId].mumId == _persons[toPersonId].dadId && //one's mum is other's dad
-            _persons[personId].dadId == _persons[toPersonId].mumId ))  //one's dad is other's mum
+        if ((_snails[snailId].mumId == _snails[toSnailId].mumId && //Same mum
+            _snails[snailId].dadId == _snails[toSnailId].dadId) || //Same dad
+            (_snails[snailId].mumId == _snails[toSnailId].dadId && //one's mum is other's dad
+            _snails[snailId].dadId == _snails[toSnailId].mumId ))  //one's dad is other's mum
             return true;
         return false;
     }
 
 
     function _isHalfSibling(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isGen0(personId) || _isGen0(toPersonId)) return false;
+        if (_isGen0(snailId) || _isGen0(toSnailId)) return false;
 
         if ( //Share either a mum or dad
-            (_persons[personId].mumId == _persons[toPersonId].mumId && //Same mum and
-            _persons[personId].dadId != _persons[toPersonId].dadId) || //not same dad OR
-            (_persons[personId].dadId == _persons[toPersonId].dadId && //Same dad and
-            _persons[personId].mumId != _persons[toPersonId].mumId) || //not same mum
+            (_snails[snailId].mumId == _snails[toSnailId].mumId && //Same mum and
+            _snails[snailId].dadId != _snails[toSnailId].dadId) || //not same dad OR
+            (_snails[snailId].dadId == _snails[toSnailId].dadId && //Same dad and
+            _snails[snailId].mumId != _snails[toSnailId].mumId) || //not same mum
             //OR 1x common parent, but mum is the others dad or visa versa
-            (_persons[personId].mumId == _persons[toPersonId].dadId && //one's mum is other's dad and
-            _persons[personId].dadId != _persons[toPersonId].mumId) || //not one's dad is other's mum OR
-            (_persons[personId].dadId == _persons[toPersonId].mumId && //one's dad is other's mum and
-            _persons[personId].mumId != _persons[toPersonId].dadId))   //not one's mum is other's dad
+            (_snails[snailId].mumId == _snails[toSnailId].dadId && //one's mum is other's dad and
+            _snails[snailId].dadId != _snails[toSnailId].mumId) || //not one's dad is other's mum OR
+            (_snails[snailId].dadId == _snails[toSnailId].mumId && //one's dad is other's mum and
+            _snails[snailId].mumId != _snails[toSnailId].dadId))   //not one's mum is other's dad
             return true;
         return false;
     }
 
 
     function _isGrandmotherOnMumsSide(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isMother(personId, _persons[toPersonId].mumId))
+        if (_isMother(snailId, _snails[toSnailId].mumId))
             return true;
         return false;
     }
 
 
     function _isGrandmotherOnDadsSide(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isMother(personId, _persons[toPersonId].dadId))
+        if (_isMother(snailId, _snails[toSnailId].dadId))
             return true;
         return false;
     }
 
 
     function _isGrandfatherOnMumsSide(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isFather(personId, _persons[toPersonId].mumId))
+        if (_isFather(snailId, _snails[toSnailId].mumId))
             return true;
         return false;
     }
 
 
     function _isGrandfatherOnDadsSide(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isFather(personId, _persons[toPersonId].dadId))
+        if (_isFather(snailId, _snails[toSnailId].dadId))
             return true;
         return false;
     }
 
 
     function _isGrandchild(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isMother(toPersonId, _persons[personId].mumId) ||
-            _isMother(toPersonId, _persons[personId].dadId) ||
-            _isFather(toPersonId, _persons[personId].dadId) ||
-            _isFather(toPersonId, _persons[personId].mumId))
+        if (_isMother(toSnailId, _snails[snailId].mumId) ||
+            _isMother(toSnailId, _snails[snailId].dadId) ||
+            _isFather(toSnailId, _snails[snailId].dadId) ||
+            _isFather(toSnailId, _snails[snailId].mumId))
             return true;
         return false;
     }
 
 
     function _isUncleAuntOnMumsSide(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isFullSibling(personId, _persons[toPersonId].mumId) ||
-            _isHalfSibling(personId, _persons[toPersonId].mumId))
+        if (_isFullSibling(snailId, _snails[toSnailId].mumId) ||
+            _isHalfSibling(snailId, _snails[toSnailId].mumId))
             return true;
         return false;
     }
 
 
     function _isUncleAuntOnDadsSide(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isFullSibling(personId, _persons[toPersonId].dadId) ||
-            _isHalfSibling(personId, _persons[toPersonId].dadId)) 
+        if (_isFullSibling(snailId, _snails[toSnailId].dadId) ||
+            _isHalfSibling(snailId, _snails[toSnailId].dadId)) 
             return true;
         return false;
     }
 
 
     function _isNephewNeice(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isUncleAuntOnMumsSide(toPersonId, personId) ||
-            _isUncleAuntOnDadsSide(toPersonId, personId)) 
+        if (_isUncleAuntOnMumsSide(toSnailId, snailId) ||
+            _isUncleAuntOnDadsSide(toSnailId, snailId)) 
             return true;
         return false;
     }
 
 
     function _isGrandNephewNeice(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
-        if (_isNephewNeice(_persons[personId].mumId, toPersonId) ||
-            _isNephewNeice(_persons[personId].dadId, toPersonId)) 
+        if (_isNephewNeice(_snails[snailId].mumId, toSnailId) ||
+            _isNephewNeice(_snails[snailId].dadId, toSnailId)) 
             return true;
         return false;
     }
 
 
     function _isFirstCousin(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
 
-        if ((_isUncleAuntOnMumsSide(_persons[personId].mumId, toPersonId) ||
-            _isUncleAuntOnMumsSide(_persons[personId].dadId, toPersonId)) ||
-            (_isUncleAuntOnDadsSide(_persons[personId].mumId, toPersonId) ||
-            (_isUncleAuntOnDadsSide(_persons[personId].dadId, toPersonId))))
+        if ((_isUncleAuntOnMumsSide(_snails[snailId].mumId, toSnailId) ||
+            _isUncleAuntOnMumsSide(_snails[snailId].dadId, toSnailId)) ||
+            (_isUncleAuntOnDadsSide(_snails[snailId].mumId, toSnailId) ||
+            (_isUncleAuntOnDadsSide(_snails[snailId].dadId, toSnailId))))
             return true;
 
         return false;
@@ -625,16 +625,16 @@ contract PersonToken is
 
 
     function _isFirstCousinOnceRemoved(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
 
-        if (_isFirstCousin(_persons[personId].mumId, toPersonId) ||
-            _isFirstCousin(_persons[personId].dadId, toPersonId)) 
+        if (_isFirstCousin(_snails[snailId].mumId, toSnailId) ||
+            _isFirstCousin(_snails[snailId].dadId, toSnailId)) 
             return true;
 
         return false;
@@ -642,31 +642,31 @@ contract PersonToken is
 
 
     function _isFirstCousinTwiceRemoved(
-        uint256 personId, 
-        uint256 toPersonId
+        uint256 snailId, 
+        uint256 toSnailId
     )
         private
         view
         returns (bool)
     {
 
-        if (_isFirstCousinOnceRemoved(_persons[personId].mumId, toPersonId) ||
-            _isFirstCousinOnceRemoved(_persons[personId].dadId, toPersonId)) 
+        if (_isFirstCousinOnceRemoved(_snails[snailId].mumId, toSnailId) ||
+            _isFirstCousinOnceRemoved(_snails[snailId].dadId, toSnailId)) 
             return true;
 
         return false;
     }
 
-    function _isGen0(uint256 personId)
+    function _isGen0(uint256 snailId)
         private view returns (bool)
     {
-        if (_persons[personId].age.generation == 0) return true;
+        if (_snails[snailId].age.generation == 0) return true;
         return false;
     }
 
     function _getRelationship(
-        uint256 personId,
-        uint256 toPersonId
+        uint256 snailId,
+        uint256 toSnailId
     )
         private
         view
@@ -674,24 +674,24 @@ contract PersonToken is
     {
         // Check for close direct and indirect blood relationships
         // (ie. from Grandparents to grandchilden & first cousins)
-        if (personId == toPersonId) return Relationship.Oneself;
-        if (_isMother(personId, toPersonId)) return Relationship.Mother;
-        if (_isFather(personId, toPersonId)) return Relationship.Father;
-        if (_isChild(personId, toPersonId)) return Relationship.Child;
-        if (_isFullSibling(personId, toPersonId)) return Relationship.FullSibling;
-        if (_isHalfSibling(personId, toPersonId)) return Relationship.HalfSibling;
-        if (_isGrandmotherOnMumsSide(personId, toPersonId)) return Relationship.GrandmotherOnMumsSide;
-        if (_isGrandmotherOnDadsSide(personId, toPersonId)) return Relationship.GrandmotherOnDadsSide;
-        if (_isGrandfatherOnMumsSide(personId, toPersonId)) return Relationship.GrandfatherOnMumsSide;
-        if (_isGrandfatherOnDadsSide(personId, toPersonId)) return Relationship.GrandfatherOnDadsSide;
-        if (_isGrandchild(personId, toPersonId)) return Relationship.Grandchild;
-        if (_isUncleAuntOnMumsSide(personId, toPersonId)) return Relationship.UncleAuntOnMumsSide;
-        if (_isUncleAuntOnDadsSide(personId, toPersonId)) return Relationship.UncleAuntOnDadsSide;
-        if (_isNephewNeice(personId, toPersonId)) return Relationship.NephewNeice;
-        if (_isGrandNephewNeice(personId, toPersonId)) return Relationship.GrandNephewNeice;
-        if (_isFirstCousin(personId, toPersonId)) return Relationship.FirstCousin;
-        if (_isFirstCousinOnceRemoved(personId, toPersonId)) return Relationship.FirstCousinOnceRemoved;
-        if (_isFirstCousinTwiceRemoved(personId, toPersonId)) return Relationship.FirstCousinTwiceRemoved;
+        if (snailId == toSnailId) return Relationship.Oneself;
+        if (_isMother(snailId, toSnailId)) return Relationship.Mother;
+        if (_isFather(snailId, toSnailId)) return Relationship.Father;
+        if (_isChild(snailId, toSnailId)) return Relationship.Child;
+        if (_isFullSibling(snailId, toSnailId)) return Relationship.FullSibling;
+        if (_isHalfSibling(snailId, toSnailId)) return Relationship.HalfSibling;
+        if (_isGrandmotherOnMumsSide(snailId, toSnailId)) return Relationship.GrandmotherOnMumsSide;
+        if (_isGrandmotherOnDadsSide(snailId, toSnailId)) return Relationship.GrandmotherOnDadsSide;
+        if (_isGrandfatherOnMumsSide(snailId, toSnailId)) return Relationship.GrandfatherOnMumsSide;
+        if (_isGrandfatherOnDadsSide(snailId, toSnailId)) return Relationship.GrandfatherOnDadsSide;
+        if (_isGrandchild(snailId, toSnailId)) return Relationship.Grandchild;
+        if (_isUncleAuntOnMumsSide(snailId, toSnailId)) return Relationship.UncleAuntOnMumsSide;
+        if (_isUncleAuntOnDadsSide(snailId, toSnailId)) return Relationship.UncleAuntOnDadsSide;
+        if (_isNephewNeice(snailId, toSnailId)) return Relationship.NephewNeice;
+        if (_isGrandNephewNeice(snailId, toSnailId)) return Relationship.GrandNephewNeice;
+        if (_isFirstCousin(snailId, toSnailId)) return Relationship.FirstCousin;
+        if (_isFirstCousinOnceRemoved(snailId, toSnailId)) return Relationship.FirstCousinOnceRemoved;
+        if (_isFirstCousinTwiceRemoved(snailId, toSnailId)) return Relationship.FirstCousinTwiceRemoved;
 
         // Check for distant direct and indirect relationships
         // (ie. related to Great-great-grandparents and their descendents)

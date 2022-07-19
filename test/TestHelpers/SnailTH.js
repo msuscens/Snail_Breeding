@@ -13,8 +13,6 @@ const Relationship = {None:0, ExPartner:1, Oneself:2, Mother:3, Father:4, Child:
   FirstCousin:17, FirstCousinOnceRemoved:18, FirstCousinTwiceRemoved:19}
 Object.freeze(Relationship);
 
-const BATCH_MATING_PAIRS_LIMIT = 10
-
 //Following constants are used by calcPseudoRandomTH
 // MAX_RANDOM_DIGITS = 76 (as MAX_UINT256.length == 78, from which -2)
 const MAX_UINT256 = toBN(2).pow(toBN(256)).subn(1) //115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -23,7 +21,6 @@ const MAX_RANDOM_DIGITS = MAX_UINT256.toString().length - 2 //Most-significant d
 //Export Test Helper Function
 module.exports = {
     Relationship: Relationship,
-    BATCH_MATING_PAIRS_LIMIT : BATCH_MATING_PAIRS_LIMIT,
     whoIsFertilisedTH: whoIsFertilisedTH,
     FERTILITY_BASE_PERCENTAGE : FERTILITY_BASE_PERCENTAGE,
     MINIMUM_FERTILITY_PERCENTAGE : MINIMUM_FERTILITY_PERCENTAGE,
