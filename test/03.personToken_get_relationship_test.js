@@ -129,8 +129,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [A_PERSON_ID], //of person
-                    [A_PERSON_ID]  //to person
+                    A_PERSON_ID, //of person
+                    A_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -148,8 +148,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [A_PERSON_ID], //of person
-                    [E_PERSON_ID]  //to person
+                    A_PERSON_ID, //of person
+                    E_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -168,8 +168,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [A_PERSON_ID], //of person
-                    [B_PERSON_ID]  //to person
+                    A_PERSON_ID, //of person
+                    B_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -195,8 +195,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [A_PERSON_ID], //of person
-                    [F_PERSON_ID]  //to person
+                    A_PERSON_ID, //of person
+                    F_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -214,7 +214,7 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [F_PERSON_ID], //of person
+                    F_PERSON_ID, //of person
                     [V_PERSON_ID]  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
@@ -233,8 +233,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [B_PERSON_ID], //of person
-                    [F_PERSON_ID]  //to person
+                    B_PERSON_ID, //of person
+                    F_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -252,7 +252,7 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [H_PERSON_ID], //of person
+                    H_PERSON_ID, //of person
                     [V_PERSON_ID]  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
@@ -271,8 +271,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [F_PERSON_ID], //of person
-                    [A_PERSON_ID]  //to person
+                    F_PERSON_ID, //of person
+                    A_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -290,8 +290,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [F_PERSON_ID], //of person
-                    [B_PERSON_ID]  //to person
+                    F_PERSON_ID, //of person
+                    B_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -313,8 +313,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [A_PERSON_ID], //of person
-                    [J_PERSON_ID]  //to person
+                    A_PERSON_ID, //of person
+                    J_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -332,8 +332,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [C_PERSON_ID], //of person
-                    [J_PERSON_ID]  //to person
+                    C_PERSON_ID, //of person
+                    J_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -351,8 +351,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [B_PERSON_ID], //of person
-                    [J_PERSON_ID]  //to person
+                    B_PERSON_ID, //of person
+                    J_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -370,8 +370,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [D_PERSON_ID], //of person
-                    [J_PERSON_ID]  //to person
+                    D_PERSON_ID, //of person
+                    J_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -392,8 +392,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [J_PERSON_ID], //of person
-                    [A_PERSON_ID]  //to person
+                    J_PERSON_ID, //of person
+                    A_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -411,8 +411,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [J_PERSON_ID], //of person
-                    [C_PERSON_ID]  //to person
+                    J_PERSON_ID, //of person
+                    C_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -431,8 +431,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [J_PERSON_ID], //of person
-                    [B_PERSON_ID]  //to person
+                    J_PERSON_ID, //of person
+                    B_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -450,8 +450,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [J_PERSON_ID], //of person
-                    [D_PERSON_ID]  //to person
+                    J_PERSON_ID, //of person
+                    D_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -473,8 +473,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [F_PERSON_ID], //of person
-                    [G_PERSON_ID]  //to person
+                    F_PERSON_ID, //of person
+                    G_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -497,8 +497,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [K_PERSON_ID], //of person
-                    [M_PERSON_ID]  //to person
+                    K_PERSON_ID, //of person
+                    M_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
@@ -516,8 +516,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             let value
             await truffleAssert.passes(
                 value = await personToken.getRelationship(
-                    [J_PERSON_ID], //of person
-                    [M_PERSON_ID]  //to person
+                    J_PERSON_ID, //of person
+                    M_PERSON_ID  //to person
                 ),
                 "Unable to get the relationship of the 2x persons!?"
             )
