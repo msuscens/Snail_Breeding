@@ -559,8 +559,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
             console.log(`Breed count: ${count} `)
             await truffleAssert.passes(
                 txBreedResult = await personToken.breed(
-                    [idMateA], //mateA
-                    [idMateB], //mateB
+                    idMateA, //mateA
+                    idMateB, //mateB
                     {from: owner}),
                 "Person owner was unable to mate their 2x persons"
             )
