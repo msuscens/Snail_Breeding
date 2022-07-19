@@ -17,7 +17,6 @@ bytes4 constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 bytes4 constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
 // Note: bytes4(keccak256('supportsInterface(bytes4) == 0x01ffc9a7'));
 
-uint256 constant _BATCH_MATING_PAIRS_LIMIT = 10;
 uint256 constant _FERTILITY_BASE_PERCENTAGE = 80;  
 uint256 constant _MINIMUM_FERTILITY_PERCENTAGE = 5;
 
@@ -72,44 +71,20 @@ contract PersonToken is
     }
 
 
-    function breed(uint256[] calldata personAIds, uint256[] calldata personBIds)
+    function breed(uint256 personAId, uint256 personBId)
         override
         external
         whenNotPaused
     {
-        // Check input parameters are in range
-        require(
-            personAIds.length == personBIds.length,
-            "breed: Mates not all paired!"
-        );
-        require(personAIds.length > 0, "breed: No persons!");
-        require(
-            personAIds.length <= _BATCH_MATING_PAIRS_LIMIT,
-            "breed: Mating pairs > limit!"
-        );
+        require(personAId != personBId, "breed: Single mate!");
+        require(_isApprovedOrOwner(msg.sender, personAId), "breed: mateA is not present!");
+        require(_isApprovedOrOwner(msg.sender, personBId), "breed: mateB is not present!");
+        
+        // Determine which of the two mates conceive and so will have an baby.
+        // NB as mates are haermaphrodites, they both may conceive (or only 1 of them or neither)
+        (Conception[] memory conceptions,,,,,,,) = _whoConceives(personAId, personBId);
 
-        // Check all persons are owned, rented by caller (or has token operator approval)
-        require(
-            _areAllPresent(personAIds),
-            "breed: MateAs not all present!"
-        );
-        require(
-            _areAllPresent(personBIds),
-            "breed: MateBs not all present!"
-        );
-
-        //Validate mating pairs, are adults, have energy, same subspecies etc. 
-        ( Status validity, uint256[][2] memory mateAs, uint256[][2] memory mateBs ) = 
-            _collateValidMates(personAIds, personBIds);
-        require(validity == Status.Valid, "breed: Invalid mates!");  
-
-
-        // Determine which persons have conceived
-        (Conception[] memory conceptions,,,,,,,) = 
-            _whoAreFertilised(mateAs, mateBs);
-
-
-        // Any new-borns are minted
+        // Mint any new-born babies (persons)
         if (conceptions.length > 0) {
 
             uint256[] memory newBornIds = _mintPersonsTo(msg.sender, conceptions);
@@ -227,231 +202,51 @@ contract PersonToken is
         }
     }
 
-
-    function _areAllPresent(uint256[] calldata personIds)
-        private
-        view
-        returns (bool allPresent)
-    {
-        for (uint8 i=0; i < personIds.length; i++)
-        {
-            if (_isPresent(personIds[i]) == false) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    function _isPresent(uint256 personId)
-        private
-        view
-        returns (bool present)
-    {
-        if (_isApprovedOrOwner(msg.sender, personId)) {
-            return true;
-        } else return false;
-    }
-
-
-    function _collateValidMates(
-        uint256[] calldata personAIds,
-        uint256[] calldata personBIds
-    )
-        private
-        view
-        returns (
-            Status validity,
-            uint256[][2] memory mateAs,
-            uint256[][2] memory mateBs
-        )
-    {
-        validity = _areValidMates(personAIds, personBIds);
-        if (validity == Status.Valid) {
-
-            mateAs[0] = new uint256[](personAIds.length); //Person Ids (for mateA)
-            mateAs[1] = new uint256[](personAIds.length); //Generation (of mateA)
-            mateBs[0] = new uint256[](personBIds.length); //Person Ids (for mateB)
-            mateBs[1] = new uint256[](personBIds.length); //Generation (of mateB)
-
-            //Collate each mating pair of persons...
-            for (uint8 i=0; i< personAIds.length; i++) 
-            {
-                //Mate's personId & dnaId
-                mateAs[0][i] = personAIds[i];
-                mateAs[1][i] = _persons[personAIds[i]].age.generation;
-                mateBs[0][i] = personBIds[i];
-                mateBs[1][i] = _persons[personBIds[i]].age.generation;
-            }
-        }
-    }
-
-
-    function _areValidMates(
-        uint256[] calldata mateAIds,
-        uint256[] calldata mateBIds
-    )
-        private
-        view
-        returns (Status validity)
-    {
-        //Check that all mateing pairs are invalid
-        for (uint8 i=0; i< mateAIds.length; i++) 
-        {
-            if (mateAIds[i] == mateBIds[i]) return Status.PairedWithSelf;
-
-            if (_areCloseBloodRelatives(mateAIds[i], mateBIds[i]))
-                return Status.PairedWithCloseFamily;
-        }
-        if (_areAllDifferent(mateAIds, mateBIds) == false)
-            return Status.PairedAlready;
-
-        return Status.Valid;
-    }
-
-
-    function _areCloseBloodRelatives(
-        uint256 personId, 
-        uint256 toPersonId
-    )
-        private
-        view
-        returns (bool)
-    {
-
-        return (
-            personId == toPersonId || //self
-            _isMother(personId, toPersonId) ||
-            _isFather(personId, toPersonId) ||
-            _isChild(personId, toPersonId) ||
-            _isFullSibling(personId, toPersonId) ||
-            _isHalfSibling(personId, toPersonId) ||
-            _isGrandmotherOnMumsSide(personId, toPersonId) ||
-            _isGrandmotherOnDadsSide(personId, toPersonId) ||
-            _isGrandfatherOnMumsSide(personId, toPersonId) ||
-            _isGrandfatherOnDadsSide(personId, toPersonId) ||
-            _isGrandchild(personId, toPersonId) ||
-            _isUncleAuntOnMumsSide(personId, toPersonId) ||
-            _isUncleAuntOnDadsSide(personId, toPersonId) ||
-            _isNephewNeice(personId, toPersonId) ||
-            _isGrandNephewNeice(personId, toPersonId) ||
-            _isFirstCousin(personId, toPersonId) ||
-            _isFirstCousinOnceRemoved(personId, toPersonId) ||
-            _isFirstCousinTwiceRemoved(personId, toPersonId)
-        );
-    }
-
-    function _areAllDifferent(
-        uint256[] calldata valueSetA,
-        uint256[] calldata valueSetB
-    )
-        private pure returns (bool)
-    {
-        if (_areDifferent(valueSetA) == false) return false;
-        if (_areDifferent(valueSetB) == false) return false;
-
-        for (uint256 i=0; i < valueSetA.length; i++) {
-            if (_occursInExactly(valueSetB, valueSetA[i],0) == false) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    function _areDifferent(uint256[] calldata valueSet)
-        private pure returns (bool)
-    {
-        for (uint256 i=0; i<valueSet.length; i++) {
-            if (_occursInExactly(valueSet,valueSet[i],1) == false) return false;
-        }
-        return true;
-    }
-
-
-    function _occursInExactly(
-        uint256[] calldata valueSet,
-        uint256 value,
-        uint256 times
-    )
-        private pure returns (bool)
-    {
-        uint256 count;
-        for(uint256 i=0; i<valueSet.length; i++) {
-            if (valueSet[i] == value) count++;
-        }
-        if (count == times) return true;
-        return false;
-    }
-
-
-
-
-    function _whoAreFertilised(
-        uint256[][2] memory mateAs,  //tokenIds & generations
-        uint256[][2] memory mateBs  //tokenIds & generations
+    function _whoConceives(
+        uint256 mateAId, //tokenId
+        uint256 mateBId  //tokenId
     )
         private
         view
         returns(
             Conception[] memory conceptions,
-            uint256[] memory atProbability,
-            uint256[] memory seed,
-            uint256[] memory pseudoRandom,
+            uint256 atProbability,
+            uint256 seed,
+            uint256 pseudoRandom,
             uint256 blockTime,
             uint256 numFertilised,
-            bool[] memory mateAFertilisations,
-            bool[] memory mateBFertilisations
+            bool mateAFertilised,
+            bool mateBFertilised
         )
     {
-        require(mateAs[0].length == mateBs[0].length, "whoAreFertilised: AB Id pairs!");
-        require(mateAs[0].length > 0, "whoAreFertilised: No mates!");
-        require(mateAs[1].length == mateBs[1].length, "whoAreFertilised: Num A&B Gens!");
-        require(mateAs[1].length == mateAs[0].length, "whoAreFertilised: Num Gens!=Ids!");
-
-        mateAFertilisations = new bool[](mateAs[0].length);
-        mateBFertilisations = new bool[](mateBs[0].length);
-        atProbability = new uint256[](mateAs[0].length);
-        seed = new uint256[](mateAs[0].length);
-        pseudoRandom = new uint256[](mateAs[0].length);
-
         blockTime = block.timestamp;
 
-        //Determine which mates are fertilised (checking each mating pair in turn)
-        for (uint256 i=0; i < mateAs[0].length; i++) {
-
-            (mateAFertilisations[i], mateBFertilisations[i], atProbability[i], seed[i], pseudoRandom[i]) =
-                _whoIsFertilised(
-                    mateAs[0][i], //tokenId
-                    mateBs[0][i], //tokenId
-                    mateAs[1][i], //generation
-                    mateBs[1][i], //generation
-                    blockTime
-                );
-
-            if (mateAFertilisations[i]) numFertilised++;
-            if (mateBFertilisations[i]) numFertilised++;
-        }
+        (mateAFertilised, mateBFertilised, atProbability, seed, pseudoRandom) =
+            _whoIsFertilised(
+                mateAId, //tokenId
+                mateBId, //tokenId
+                blockTime
+            );
+        if (mateAFertilised) numFertilised++;
+        if (mateBFertilised) numFertilised++;
     
         //Gather conception details
         if (numFertilised > 0) {
 
             conceptions = _matesConceive(
-                numFertilised,
-                mateAFertilisations,
-                mateBFertilisations,
-                mateAs, 
-                mateBs 
+                mateAId, 
+                mateBId,
+                mateAFertilised,
+                mateBFertilised
             );
         }
     }
 
 
+    // *** NOTE: DEMEO CODE ONLY: THIS IS UNSAFE MANNER OF GENERATING PSEUDO-RANDOM NUMBERS ***
     function _whoIsFertilised(
         uint256 idMateA,  //tokenId
         uint256 idMateB,  //tokenId
-        uint256 genMateA, //generation
-        uint256 genMateB, //generation
         uint256 blockTime
     )
         private
@@ -466,9 +261,12 @@ contract PersonToken is
     {
         require(idMateA != idMateB, "_whoIsFertilised: Only 1x Mate!");
 
-        fertilityPercentage = _calculateFertility(genMateA, genMateB);
+        fertilityPercentage = _calculateFertility(
+            _persons[idMateA].age.generation,
+            _persons[idMateB].age.generation
+        );
 
-        //Does either (or both) of mates get fertilised?
+        //Are either (or both) mates fertilised?
         seed = blockTime + idMateA + idMateB + _personIdCounter;
         pseudoRandom =_calcPseudoRandom(4, seed); //2x 2-digit numbers 
         uint256 random = pseudoRandom;
@@ -482,61 +280,46 @@ contract PersonToken is
 
 
     function _matesConceive(
-        uint256 numFertilised,
-        bool[] memory mateAFertilisations,
-        bool[] memory mateBFertilisations,
-        uint256[][2] memory mateAs, 
-        uint256[][2] memory mateBs
+        uint256 mateAId, 
+        uint256 mateBId,
+        bool mateAFertilised,
+        bool mateBFertilised
     ) 
         private
-        pure
+        view
         returns(Conception[] memory conceptions)
     {
-        require(numFertilised > 0, "_matesConceive IE: No fertilisations!");
-        require(mateAFertilisations.length > 0, "_matesConceive IE: No mates!");
-
-        require(mateAFertilisations.length == mateBFertilisations.length, "_matesConceive IE: Fert. params!");
-        require(mateAFertilisations.length == mateAs[0].length, "_matesConceiveIE: Fert/Id pairs!");
-        require(mateAs[0].length == mateBs[0].length, "_matesConceiveIE:Mates Id pairs!");
+        require(mateAFertilised || mateBFertilised, "_matesConceive IE: No fertilisations!");
+        uint numFertilised = (mateAFertilised && mateBFertilised) ? 2 : 1;
 
         // Determine details of each fertilisation (conception)
         conceptions = new Conception[](numFertilised);
-        require(
-            numFertilised == conceptions.length,
-            "_matesConceiveIE: Invarient!"
-        );
+
+        uint256 newGeneration =
+            _persons[mateAId].age.generation > _persons[mateBId].age.generation ?
+                _persons[mateAId].age.generation+1 :
+                _persons[mateBId].age.generation+1;
 
         uint8 index;
-        uint256 newGeneration;
-        for (uint8 i=0; i < mateAFertilisations.length; i++) {
-
-            if (mateAFertilisations[i] || mateBFertilisations[i] ) {
-
-                // Calculate Generation (highest of mum/dads generation, plus one)
-                newGeneration = mateAs[1][i] > mateBs[1][i] ?
-                    mateAs[1][i]+1 : mateBs[1][i]+1;
-            }
-
-            if (mateAFertilisations[i] == true) {
-                conceptions[index] = Conception(
-                    {
-                        generation: newGeneration,
-                        mumId: mateAs[0][i],
-                        dadId: mateBs[0][i]
-                    }
-                );
-                index++;
-            }
-            if (mateBFertilisations[i] == true) {
-                conceptions[index] = Conception(
-                    {
-                        generation: newGeneration,
-                        mumId: mateBs[0][i],
-                        dadId: mateAs[0][i]
-                    }
-                );
-                index++;
-            }
+        if (mateAFertilised == true) {
+            conceptions[index] = Conception(
+                {
+                    generation: newGeneration,
+                    mumId: mateAId,
+                    dadId: mateBId
+                }
+            );
+            index++;
+        }
+        if (mateBFertilised == true) {
+            conceptions[index] = Conception(
+                {
+                    generation: newGeneration,
+                    mumId: mateBId,
+                    dadId: mateAId
+                }
+            );
+            index++;
         }
         require(index == numFertilised, "_matesConceive IE: index fail!");
     }    

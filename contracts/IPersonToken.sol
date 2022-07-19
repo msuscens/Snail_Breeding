@@ -55,19 +55,14 @@ interface IPersonToken
 
 
     /*
-    * Breed one or more pairs of persons, with a chance that each mating pair
-    * may each produce a new-born.
-    * Note: New-born chance is governed by _FERTILITY_BASE_PERCENTAGE, modified
-    *   by the mate's generations.
+    * Breed two people (who are haemaphrodites), so either may conceive and mint a baby (new-born person).
+    * Note: New-born chance is governed by _FERTILITY_BASE_PERCENTAGE, modified by mate's generations.
     * Requirement: A person is unable to breed without a mate.
     * Requirement: A person is unable to mate with itself.
-    * Requirement: All mating persons must be present (ie. caller is owner or renter).
-    * Requirement: No Person in a batch breed may be specified more than once.
-    * Requirement: Amount breading person pairs <= PersonToken's _BATCH_MATING_PAIRS_LIMIT
-    * Requirement: A person must only be in one mating pair (in a breed tx).
-    * Event emitted: BabiesBorn (only if 1+ new-borns are minted)
+    * Requirement: All mating persons must be present (ie. caller is owner or approver).
+    * Event emitted: BabiesBorn (only if 1+ new-born persons are minted)
     */
-    function breed(uint256[] calldata mateAIds, uint256[] calldata mateBIds) external;
+    function breed(uint256 mateAId, uint256 mateBId) external;
 
     /*
     * Get all the Person's details of the specified person token.
