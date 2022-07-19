@@ -19,7 +19,7 @@ const toNumbers = arr => arr.map(Number);
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i])
 
 
-contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
+contract("02 PersonToken - Two people breed", async accounts => {
 
     "use strict"
 
@@ -85,47 +85,16 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
             await timeMachine.revertToSnapshot(snapshotId)
         })
 
-        it("should NOT allow breed both mates are NOT specified", async () => {
-
-            await truffleAssert.reverts(
-                personToken.breed(
-                    [], //mateA - omitted
-                    [], //mateB - omitted
-                    {from: accounts[2]}
-                ),
-                "breed: No persons!"
-            )
-        })
-
-        it("should NOT allow breed if only a single mate is specified", async () => {
-
-            await truffleAssert.reverts(
-                personToken.breed(
-                    [A_PERSON_ID], //mateA - owned by accounts[2]
-                    [], //mateB - omitted
-                    {from: accounts[2]}
-                ),
-                "breed: Mates not all paired!"
-            )
-            await truffleAssert.reverts(
-                personToken.breed(
-                    [], //mateA - omitted
-                    [B_PERSON_ID], //mateB - owned by accounts[2]
-                    {from: accounts[2]}
-                ),
-                "breed: Mates not all paired!"
-            )
-        })
 
         it("should NOT allow breed if neither mate is present (owned/approved)", async () => {
 
             await truffleAssert.reverts(
                 personToken.breed(
-                    [A_PERSON_ID], //mateA - owned by accounts[2]
-                    [B_PERSON_ID], //mateB - owned by accounts[2]
+                    A_PERSON_ID, //mateA - owned by accounts[2]
+                    B_PERSON_ID, //mateB - owned by accounts[2]
                     {from: accounts[0]}
                 ),
-                "breed: MateAs not all present!"
+                "breed: mateA is not present!"
             )
         })
 
@@ -133,19 +102,19 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
 
             await truffleAssert.reverts(
                 personToken.breed(
-                    [C_PERSON_ID], //mateA - owned by accounts[0]
-                    [A_PERSON_ID], //mateB - owned by accounts[2]
+                    C_PERSON_ID, //mateA - owned by accounts[0]
+                    A_PERSON_ID, //mateB - owned by accounts[2]
                     {from: accounts[2]}
                 ),
-                "breed: MateAs not all present!"
+                "breed: mateA is not present!"
             )
             await truffleAssert.reverts(
                 personToken.breed(
-                    [A_PERSON_ID], //mateA - owned by accounts[2] 
-                    [C_PERSON_ID], //mateB - owned by accounts[0]
+                    A_PERSON_ID, //mateA - owned by accounts[2] 
+                    C_PERSON_ID, //mateB - owned by accounts[0]
                     {from: accounts[2]}
                 ),
-                "breed: MateBs not all present!"
+                "breed: mateB is not present!"
             )
         })
 
@@ -153,11 +122,11 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
 
             await truffleAssert.reverts(
                 personToken.breed(
-                    [A_PERSON_ID], //mateA
-                    [A_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA
+                    A_PERSON_ID, //mateB
                     {from: accounts[2]}
                 ),
-                "breed: Invalid mates!"
+                "breed: With self!"
             )
         })
     })
@@ -213,8 +182,8 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
 
             await truffleAssert.passes(
                 personToken.breed(
-                    [A_PERSON_ID], //mateA                
-                    [B_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA                
+                    B_PERSON_ID, //mateB
                     {from: accounts[2]}),
                 "Person owner was unable to breed their persons"
             )
@@ -225,8 +194,8 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
             let txBreedResult
             await truffleAssert.passes(
                 txBreedResult = await personToken.breed(
-                    [A_PERSON_ID], //mateA                
-                    [B_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA                
+                    B_PERSON_ID, //mateB
                     {from: accounts[2]}),
                 "Person owner was unable to breed their persons"
             )
@@ -297,8 +266,8 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
             let txBreedResult
             await truffleAssert.passes(
                 txBreedResult = await personToken.breed(
-                    [A_PERSON_ID], //mateA
-                    [B_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA
+                    B_PERSON_ID, //mateB
                     {from: accounts[2]}),
                 "Person owner was unable to breed their persons"
             )
@@ -333,8 +302,8 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
             let txBreedResult
             await truffleAssert.passes(
                 txBreedResult = await personToken.breed(
-                    [A_PERSON_ID], //mateA
-                    [B_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA
+                    B_PERSON_ID, //mateB
                     {from: accounts[2]}),
                 "Owner was unable to breed their persons"
             )
@@ -413,8 +382,8 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
             )
             await truffleAssert.reverts(
                 personToken.breed(
-                    [A_PERSON_ID], //mateA
-                    [B_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA
+                    B_PERSON_ID, //mateB
                     {from: accounts[2]}
                 ),
                 "Pausable: paused"
@@ -435,8 +404,8 @@ contract("02 PersonToken - Two people (one-pair) breed", async accounts => {
             )
             await truffleAssert.passes(
                 personToken.breed(
-                    [A_PERSON_ID], //mateA
-                    [B_PERSON_ID], //mateB
+                    A_PERSON_ID, //mateA
+                    B_PERSON_ID, //mateB
                     {from: accounts[2]}
                 ),
                 "Person owner was unable to breed their persons"
