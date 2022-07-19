@@ -7,10 +7,6 @@ enum Relationship {None, ExPartner, Oneself, Mother, Father, Child, FullSibling,
     Grandchild, UncleAuntOnMumsSide, UncleAuntOnDadsSide, NephewNeice, GrandNephewNeice,
     FirstCousin, FirstCousinOnceRemoved, FirstCousinTwiceRemoved
 }
-enum Status {Valid, Repeated, LacksEnergy, Immature, NotAdult, OldestAgeGroup,
-    PairedWithSelf, PairedAlready, PairedWithAnotherSubspecies,
-    PairedWithAnotherAgeGroup, PairedWithCloseFamily
-}
 
 interface IPersonToken 
 {
@@ -43,7 +39,7 @@ interface IPersonToken
     * new-borns to the specified owner.
     * Requirement: Only contract owner may execute this function.
     * Requirement: The owner must not be the 0 address
-    * Requirement: If generation-0 to be minted, both parent Ids must be 0
+    * Requirement: If generation-0 to be minted, both parent Ids must == 0
     * Event emitted: Transfer (for each newly minted person token) 
     */
     function mintPersonsTo(
