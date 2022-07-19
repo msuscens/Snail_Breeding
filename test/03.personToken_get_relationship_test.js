@@ -8,7 +8,7 @@ const timeMachine = require('ganache-time-traveler')
 
 // Test Helpers
 const Relationship = require('./TestHelpers/PersonTH.js').Relationship
-const whoIsFertilisedTH= require('./TestHelpers/PersonTH.js').whoIsFertilisedTH
+const whoIsFertilisedTH = require('./TestHelpers/PersonTH.js').whoIsFertilisedTH
 
 const PersonToken = artifacts.require("PersonToken")
 
@@ -70,8 +70,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
     before(`Family 1: Breed (mate ids: ${A_PERSON_ID} & ${B_PERSON_ID}), until both get a child (from same breed event)`, async function() {
 
         const personIds = await breedUntilBothProdueNewBorn(A_PERSON_ID, B_PERSON_ID, accounts[2])
-        F_PERSON_ID = personIds[0]
-        G_PERSON_ID = personIds[1]
+        F_PERSON_ID = Number(personIds[0])
+        G_PERSON_ID = Number(personIds[1])
     })
 
     // FAMILY 2 - C_PERSON_ID & D_PERSON_ID, breed until both get a child (from same breed event)
@@ -80,8 +80,8 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
     before(`Family 2: Breed (mate ids: ${C_PERSON_ID} & ${D_PERSON_ID}), until both have a child (at same time)`, async function() {
 
         const personIds = await breedUntilBothProdueNewBorn(C_PERSON_ID, D_PERSON_ID, accounts[2])
-        H_PERSON_ID = personIds[0]
-        I_PERSON_ID = personIds[1]
+        H_PERSON_ID = Number(personIds[0])
+        I_PERSON_ID = Number(personIds[1])
     })
 
     // BREED 1st GRANDCHILDREN from inter-breeding of Families 1 & 2:
@@ -91,21 +91,21 @@ contract("03 PersonToken - Get Relationship between two people", async accounts 
     // FAMILIES 1&2 Interbreed: F_PERSON (Familiy-1) with H_PERSON (Familiy-2)
     let J_PERSON_ID //Families 1&2 Interbreed: Child (of parents: F & H)
     let K_PERSON_ID //Families 1&2 Interbreed: Child (of parents: H & F)
-    before(`Family 2: Breed Mates: F_PERSON_ID & H_PERSON_ID, until both have a child (at same time)`, async function() {
+    before(`Family 2&3: Breed Mates: F_PERSON_ID (family 1) & H_PERSON_ID (family 2), until both have a child (at same time)`, async function() {
 
         const personIds = await breedUntilBothProdueNewBorn(F_PERSON_ID, H_PERSON_ID, accounts[2])
-        J_PERSON_ID = personIds[0]
-        K_PERSON_ID = personIds[1]
+        J_PERSON_ID = Number(personIds[0])
+        K_PERSON_ID = Number(personIds[1])
     })
 
     // FAMILIES 1&2 Interbreed: G_PERSON (Familiy-1) with I_PERSON (Familiy-2)
     let L_PERSON_ID  //Families 1&2 Interbreed: Child (of parents: G & I)
     let M_PERSON_ID  //Families 1&2 Interbreed: Child (of parents: I & G)
-    before(`Family 2: Breed Mates: G_PERSON_ID & I_PERSON_ID, until both have a child (at same time)`, async function() {
+    before(`Family 1&2: Breed Mates: G_PERSON_ID (family 1) & I_PERSON_ID (family 2), until both have a child (at same time)`, async function() {
 
         const personIds = await breedUntilBothProdueNewBorn(G_PERSON_ID, I_PERSON_ID, accounts[2])
-        L_PERSON_ID = personIds[0]
-        M_PERSON_ID = personIds[1]
+        L_PERSON_ID = Number(personIds[0])
+        M_PERSON_ID = Number(personIds[1])
     })
 
 
