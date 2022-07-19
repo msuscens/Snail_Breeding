@@ -73,7 +73,7 @@ contract("02 SnailToken - Two snails breed", async accounts => {
     const C_SNAIL_ID = 2 //Owner accounts[0]
 
 
-    describe("Breed snails: Both mates must be present", () => {
+    describe("Breed Snails: Both mates must be present", () => {
 
         let snapshotId
         beforeEach("Save Initial Setup State (of blockchain)", async() => {
@@ -132,11 +132,11 @@ contract("02 SnailToken - Two snails breed", async accounts => {
     })
 
 
-    describe("Breed 2-Snails: ", () => {
+    describe("Breed 2x Snails: ", () => {
 
         let genMateA
         let genMateB
-        before(`Get snail's Generations (MateA snailId: ${A_SNAIL_ID} & MateB's snailId: ${B_SNAIL_ID})`, async function() {
+        before(`Get snails' Generations (MateA snailId: ${A_SNAIL_ID} & MateB's snailId: ${B_SNAIL_ID})`, async function() {
     
             let snailMateA
             await truffleAssert.passes(
@@ -189,7 +189,7 @@ contract("02 SnailToken - Two snails breed", async accounts => {
             )
         })
 
-        it("should if breed results in any new-born snails, emit a 'SnailsBorn' event", async () => {
+        it("should when there are new-born snails (from breeding), emit a 'SnailsBorn' event", async () => {
 
             let txBreedResult
             await truffleAssert.passes(
