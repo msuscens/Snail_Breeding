@@ -82,18 +82,44 @@ contract SnailToken is
         
         // Determine which of the two mates conceive and so will give birth to a new-born snail.
         // NB as mates are haermaphrodites, they both may conceive (or only 1 of them or neither)
-        (Conception[] memory conceptions,,,,,,,) = _whoConceives(snailAId, snailBId);
+        // (Conception[] memory conceptions,,,,,,,) = _whoConceives(snailAId, snailBId);
+        
+        Conception[] memory conceptions = new Conception[](2);
+
+        uint256 newGeneration =
+            _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
+                _snails[snailAId].age.generation+1 :
+                _snails[snailBId].age.generation+1;
+
+        conceptions[0] = Conception(
+            {
+                generation: newGeneration,
+                mumId: snailAId, //tokenId
+                dadId: snailBId  //tokenId
+            }
+        );
+        conceptions[1] = Conception(
+            {
+                generation: newGeneration,
+                mumId: snailBId, //tokenId
+                dadId: snailAId  //tokenId
+            }
+        );
+        require(
+            conceptions.length == 2,
+            "breedIE: conceptions!=2!"
+        );
 
         // Mint any new-born snails
         if (conceptions.length > 0) {
 
-            uint256[] memory newBornIds = _mintSnailsTo(msg.sender, conceptions);
+            uint256[] memory newBornSnailIds = _mintSnailsTo(msg.sender, conceptions);
 
             require(
-                newBornIds.length == conceptions.length,
+                newBornSnailIds.length == conceptions.length,
                 "breedIE: conceptions!=newBorns!"
             );
-            emit SnailsBorn(msg.sender, newBornIds, conceptions);
+            emit SnailsBorn(msg.sender, newBornSnailIds, conceptions);
         }
     }
 
