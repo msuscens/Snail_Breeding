@@ -19,7 +19,7 @@ const toNumbers = arr => arr.map(Number);
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i])
 
 
-contract("04 SnailToken - Two snails breedMateAFertilised", async accounts => {
+contract("05 SnailToken - Two snails breedMateAFertilised", async accounts => {
 
     "use strict"
 
