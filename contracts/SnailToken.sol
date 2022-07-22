@@ -17,8 +17,6 @@ bytes4 constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 bytes4 constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
 // Note: bytes4(keccak256('supportsInterface(bytes4) == 0x01ffc9a7'));
 
-uint256 constant _FERTILITY_BASE_PERCENTAGE = 80;  
-uint256 constant _MINIMUM_FERTILITY_PERCENTAGE = 5;
 
 
 contract SnailToken is
@@ -79,37 +77,146 @@ contract SnailToken is
         require(snailAId != snailBId, "breed: With self!");
         require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
         require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
-        
+
         // Determine which of the two mates conceive and so will give birth to a new-born snail.
-        // NB as mates are haermaphrodites, they both may conceive (or only 1 of them or neither)
-        // (Conception[] memory conceptions,,,,,,,) = _whoConceives(snailAId, snailBId);
-        
-        Conception[] memory conceptions = new Conception[](2);
-        // Conception[] memory conceptions;
+        // NB as snails are hermaphrodites (are both male & femaile), they both may conceive (or only 1 of them or neither)
 
-        uint256 newGeneration =
-            _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
-                _snails[snailAId].age.generation+1 :
-                _snails[snailBId].age.generation+1;
+        // Pseudo-randomly determine who  is fertilised (Mate A and/or Mate B, or neither)
+        uint256 timestamp = block.timestamp;
+        uint256 pseudoRandomA = (timestamp % 10);     //last digit (of timestamp)
+        uint256 pseudoRandomB = (timestamp % 100)/10; //second last digit (of timestamp)
 
-        conceptions[0] = Conception(
-            {
-                generation: newGeneration,
-                mumId: snailAId, //tokenId
-                dadId: snailBId  //tokenId
+        bool mateAFertilised = (pseudoRandomA % 2) == 1 ? true: false;
+        bool mateBFertilised = (pseudoRandomB % 2) == 1 ? true: false;
+
+
+        Conception[] memory conceptions;
+
+        if (mateAFertilised || mateBFertilised){
+
+            uint256 newGeneration =
+                _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
+                    _snails[snailAId].age.generation+1 :
+                    _snails[snailBId].age.generation+1;
+
+            if (mateAFertilised && mateBFertilised) {
+                conceptions = new Conception[](2);
+
+                conceptions[0] = Conception(
+                    {
+                        generation: newGeneration,
+                        mumId: snailAId, //tokenId
+                        dadId: snailBId  //tokenId
+                    }
+                );
+                conceptions[1] = Conception(
+                    {
+                        generation: newGeneration,
+                        mumId: snailBId, //tokenId
+                        dadId: snailAId  //tokenId
+                    }
+                );
+                require(
+                    conceptions.length == 2,
+                    "breedIE: conceptions!=2!"
+                );
             }
-        );
-        conceptions[1] = Conception(
-            {
-                generation: newGeneration,
-                mumId: snailBId, //tokenId
-                dadId: snailAId  //tokenId
+            else {
+                conceptions = new Conception[](1);
+
+                if (mateAFertilised && !mateBFertilised) {
+
+                    conceptions[0] = Conception(
+                        {
+                            generation: newGeneration,
+                            mumId: snailAId, //tokenId
+                            dadId: snailBId  //tokenId
+                        }
+                    );
+                }
+                else if (mateBFertilised && !mateAFertilised) {
+                    conceptions[0] = Conception(
+                        {
+                            generation: newGeneration,
+                            mumId: snailBId, //tokenId
+                            dadId: snailAId  //tokenId
+                        }
+                    ); 
+                }
+                else {
+                    revert("Logic error in code");
+                }
+                require(
+                    conceptions.length == 1,
+                    "breedIE: conceptions!=1!"
+                );
             }
-        );
-        require(
-            conceptions.length == 2,
-            "breedIE: conceptions!=2!"
-        );
+        }
+        else {
+            require(
+                conceptions.length == 0,
+                "breedIE: conceptions!=0!"
+            );
+        }
+       
+        emit SnailsMated(snailAId, snailBId, mateAFertilised, mateBFertilised, conceptions);
+/*
+        // **** HARDWIRING FERTILISATION RESULT
+        //
+        // uint256 newGeneration =
+        //     _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
+        //         _snails[snailAId].age.generation+1 :
+        //         _snails[snailBId].age.generation+1;
+        //
+        // * SPECIICALLY: ONLY MATE A FERTILISED *
+        // Conception[] memory conceptions = new Conception[](1);
+        // conceptions[0] = Conception(
+        //     {
+        //         generation: newGeneration,
+        //         mumId: snailAId, //tokenId
+        //         dadId: snailBId  //tokenId
+        //     }
+        // );
+        // require(
+        //     conceptions.length == 1,
+        //     "breedIE: conceptions!=1!"
+        // );
+
+        // * SPECIICALLY: ONLY MATE B FERTILISED *
+        // Conception[] memory conceptions = new Conception[](1);
+        // conceptions[0] = Conception(
+        //     {
+        //         generation: newGeneration,
+        //         mumId: snailBId, //tokenId
+        //         dadId: snailAId  //tokenId
+        //     }
+        // );
+        // require(
+        //     conceptions.length == 1,
+        //     "breedIE: conceptions!=1!"
+        // );
+
+        // * SPECIICALLY: BOTH MATES (A & B) FERTILISED *
+        // Conception[] memory conceptions = new Conception[](2);
+        // conceptions[0] = Conception(
+        //     {
+        //         generation: newGeneration,
+        //         mumId: snailAId, //tokenId
+        //         dadId: snailBId  //tokenId
+        //     }
+        // );
+        // conceptions[1] = Conception(
+        //     {
+        //         generation: newGeneration,
+        //         mumId: snailBId, //tokenId
+        //         dadId: snailAId  //tokenId
+        //     }
+        // );
+        // require(
+        //     conceptions.length == 2,
+        //     "breedIE: conceptions!=2!"
+        // );
+*/
 
         // Mint any new-born snails
         if (conceptions.length > 0) {
@@ -120,7 +227,7 @@ contract SnailToken is
                 newBornSnailIds.length == conceptions.length,
                 "breedIE: conceptions!=newBorns!"
             );
-            emit SnailsBorn(msg.sender, newBornSnailIds, conceptions);
+            emit SnailsBorn(msg.sender, newBornSnailIds);
         }
     }
 
@@ -205,6 +312,9 @@ contract SnailToken is
         private
         returns (uint256[] memory newBornIds)
     {
+        require(fromConceptions.length > 0, "_mintSnailsToIE: 0 conceptions!");
+        // require(fromConceptions.length <= 2, "_mintSnailsToIE: Too many conceptions!");
+
         //Mint each snail
         newBornIds = new uint256[](fromConceptions.length);
         for (uint8 i=0; i < fromConceptions.length; i++) {
@@ -229,164 +339,6 @@ contract SnailToken is
         }
     }
 
-    function _whoConceives(
-        uint256 mateAId, //tokenId
-        uint256 mateBId  //tokenId
-    )
-        private
-        view
-        returns(
-            Conception[] memory conceptions,
-            uint256 atProbability,
-            uint256 seed,
-            uint256 pseudoRandom,
-            uint256 blockTime,
-            uint256 numFertilised,
-            bool mateAFertilised,
-            bool mateBFertilised
-        )
-    {
-        blockTime = block.timestamp;
-
-        (mateAFertilised, mateBFertilised, atProbability, seed, pseudoRandom) =
-            _whoIsFertilised(
-                mateAId, //tokenId
-                mateBId, //tokenId
-                blockTime
-            );
-        if (mateAFertilised) numFertilised++;
-        if (mateBFertilised) numFertilised++;
-    
-        //Gather conception details
-        if (numFertilised > 0) {
-
-            conceptions = _matesConceive(
-                mateAId, 
-                mateBId,
-                mateAFertilised,
-                mateBFertilised
-            );
-        }
-    }
-
-
-    // *** NOTE: DEMEO CODE ONLY: THIS IS UNSAFE MANNER OF GENERATING PSEUDO-RANDOM NUMBERS ***
-    function _whoIsFertilised(
-        uint256 idMateA,  //tokenId
-        uint256 idMateB,  //tokenId
-        uint256 blockTime
-    )
-        private
-        view
-        returns(
-            bool fertilisedMateA,
-            bool fertilisedMateB,
-            uint256 fertilityPercentage,
-            uint256 seed,
-            uint256 pseudoRandom
-        )
-    {
-        require(idMateA != idMateB, "_whoIsFertilised: Only 1x Mate!");
-
-        fertilityPercentage = _calculateFertility(
-            _snails[idMateA].age.generation,
-            _snails[idMateB].age.generation
-        );
-
-        //Are either (or both) mates fertilised?
-        seed = blockTime + idMateA + idMateB + _snailIdCounter;
-        pseudoRandom =_calcPseudoRandom(4, seed); //2x 2-digit numbers 
-        uint256 random = pseudoRandom;
-
-        fertilisedMateA = (random % 100) < fertilityPercentage;
-        random /= 100;
-        fertilisedMateB = (random % 100) < fertilityPercentage;
-
-        require(random/100 == 1, "_whoIsFertilisedIE: random fail!");
-    }
-
-
-    function _matesConceive(
-        uint256 mateAId, 
-        uint256 mateBId,
-        bool mateAFertilised,
-        bool mateBFertilised
-    ) 
-        private
-        view
-        returns(Conception[] memory conceptions)
-    {
-        require(mateAFertilised || mateBFertilised, "_matesConceive IE: No fertilisations!");
-        uint numFertilised = (mateAFertilised && mateBFertilised) ? 2 : 1;
-
-        // Determine details of each fertilisation (conception)
-        conceptions = new Conception[](numFertilised);
-
-        uint256 newGeneration =
-            _snails[mateAId].age.generation > _snails[mateBId].age.generation ?
-                _snails[mateAId].age.generation+1 :
-                _snails[mateBId].age.generation+1;
-
-        uint8 index;
-        if (mateAFertilised == true) {
-            conceptions[index] = Conception(
-                {
-                    generation: newGeneration,
-                    mumId: mateAId,
-                    dadId: mateBId
-                }
-            );
-            index++;
-        }
-        if (mateBFertilised == true) {
-            conceptions[index] = Conception(
-                {
-                    generation: newGeneration,
-                    mumId: mateBId,
-                    dadId: mateAId
-                }
-            );
-            index++;
-        }
-        require(index == numFertilised, "_matesConceive IE: index fail!");
-    }    
-
-
-    function _calculateFertility(uint256 genMateA, uint256 genMateB)
-        private
-        pure
-        returns (uint256 fertilityPercentage)
-    {
-        uint256 fertilityReduction = (genMateA + genMateB) / 2;
-
-        if (_FERTILITY_BASE_PERCENTAGE > 
-                (fertilityReduction + _MINIMUM_FERTILITY_PERCENTAGE)
-            )
-        {
-            fertilityPercentage = _FERTILITY_BASE_PERCENTAGE - fertilityReduction;
-        }
-        else
-        {
-            fertilityPercentage = _MINIMUM_FERTILITY_PERCENTAGE;
-        }
-    }
-
-
-    function _calcPseudoRandom(uint256 numDigits, uint256 seed)
-        private
-        pure
-        returns (uint256 random)
-    {
-        require(numDigits>0, "_calcPseudoRandom: Of 0 digits!");
-        require(numDigits <= 76, "_calcPseudoRandom IE:>76 digits!");
-
-        uint256 value = uint256( keccak256(abi.encodePacked(seed)) );
-
-        random = value % (10**numDigits);
-
-        // Allow for most-sig digit(s) to be '0'
-        random += 10**numDigits; //Add leading '1' digit
-    }
 
 
     function _isExPartner(
