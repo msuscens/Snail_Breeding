@@ -27,10 +27,18 @@ interface ISnailToken
         uint256 dadId;  //tokenId
     }
 
+
+    event SnailsMated(
+        uint256 snailIdMateA,
+        uint256 snailIdMateB,
+        bool mateAFertilised,
+        bool mateBFertilised,
+        Conception[] conceptions
+    );
+
     event SnailsBorn(
         address owner,
-        uint256[] babyIds,
-        Conception[] provenance
+        uint256[] babyIds
     );
 
 
@@ -51,7 +59,7 @@ interface ISnailToken
 
 
     /*
-    * Breed two snails (who are haemaphrodites), so that either may conceive and mint a new-born snail.
+    * Breed two snails (who are hermaphrodites), so that either may conceive and mint a new-born snail.
     * Therefore both, one, or neither of the 2x mating snails may create a new-born snail (as result of breeding)
     * Note: New-born chance is governed by _FERTILITY_BASE_PERCENTAGE, modified by mate's generations.
     * Requirement: A snail is unable to breed without a mate.
