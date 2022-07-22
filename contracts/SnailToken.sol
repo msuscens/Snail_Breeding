@@ -85,6 +85,7 @@ contract SnailToken is
         // (Conception[] memory conceptions,,,,,,,) = _whoConceives(snailAId, snailBId);
         
         Conception[] memory conceptions = new Conception[](2);
+        // Conception[] memory conceptions;
 
         uint256 newGeneration =
             _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
@@ -388,25 +389,25 @@ contract SnailToken is
     }
 
 
-    // function _isExPartner(
-    //     uint256 snailId, 
-    //     uint256 toSnailId
-    // )
-    //     private
-    //     view
-    //     returns (bool)
-    // {
-    //     uint256 nextId = (snailId > toSnailId ) ? snailId: toSnailId;
+    function _isExPartner(
+        uint256 snailId, 
+        uint256 toSnailId
+    )
+        private
+        view
+        returns (bool)
+    {
+        uint256 nextId = (snailId > toSnailId ) ? snailId+1: toSnailId+1;
 
-    //     while (_snails[nextId].dnaId != 0) { // there's another snail
+        while (nextId <= _snailIdCounter) { // there's another snail
 
-    //         if (_snails[nextId].mumId == snailId && _snails[nextId].dadId == toSnailId ||
-    //             _snails[nextId].mumId == toSnailId && _snails[nextId].dadId == snailId)
-    //             return true;
-    //         nextId++;
-    //     }
-    //     return false;
-    // }
+            if (_snails[nextId].mumId == snailId && _snails[nextId].dadId == toSnailId ||
+                _snails[nextId].mumId == toSnailId && _snails[nextId].dadId == snailId)
+                return true;
+            nextId++;
+        }
+        return false;
+    }
 
 
     function _isMother(
@@ -721,6 +722,9 @@ contract SnailToken is
 
         // Check for distant direct and indirect relationships
         // (ie. related to Great-great-grandparents and their descendents)
+
+        // An ex-partner?
+        if (_isExPartner(snailId, toSnailId)) return Relationship.ExPartner;
 
         return (Relationship.None);
     }
