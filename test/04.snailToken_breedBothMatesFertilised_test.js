@@ -278,7 +278,7 @@ contract("04 SnailToken - Two snails breedBothMatesFertilised", async accounts =
                 "Snail owner was unable to breed their snails"
             )
 
-            truffleAssert.eventEmitted(txBreedResult1, 'SnailsMated', (ev) => {
+            truffleAssert.eventEmitted(txBreedResult2, 'SnailsMated', (ev) => {
                 return ev.conceptions.length === 2 &&
                     Number(ev.conceptions[0].mumId) === A_SNAIL_ID &&
                     Number(ev.conceptions[0].dadId) === B_SNAIL_ID &&
@@ -298,7 +298,7 @@ contract("04 SnailToken - Two snails breedBothMatesFertilised", async accounts =
                 "Snail owner was unable to breed their snails"
             )
 
-            truffleAssert.eventEmitted(txBreedResult1, 'SnailsMated', (ev) => {
+            truffleAssert.eventEmitted(txBreedResult3, 'SnailsMated', (ev) => {
                 return ev.conceptions.length === 2 &&
                     Number(ev.conceptions[0].mumId) === A_SNAIL_ID &&
                     Number(ev.conceptions[0].dadId) === B_SNAIL_ID &&
