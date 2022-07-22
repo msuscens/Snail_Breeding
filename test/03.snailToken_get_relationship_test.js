@@ -8,7 +8,7 @@ const timeMachine = require('ganache-time-traveler')
 
 // Test Helpers
 const Relationship = require('./TestHelpers/SnailTH.js').Relationship
-const whoIsFertilisedTH = require('./TestHelpers/SnailTH.js').whoIsFertilisedTH
+const calcFertilisationTH= require('./TestHelpers/SnailTH.js').calcFertilisationTH
 
 const SnailToken = artifacts.require("SnailToken")
 
@@ -21,7 +21,6 @@ contract("03 SnailToken - Get Relationship between two snails", async accounts =
     "use strict"
 
     let snailToken
-
 
     before("Deploy SnailToken contract", async function() {
 
@@ -564,16 +563,29 @@ contract("03 SnailToken - Get Relationship between two snails", async accounts =
                     {from: owner}),
                 "Snail owner was unable to mate their 2x snails"
             )
-            // Determine the number of new-borns (0,1, or 2)
-            const expected = await whoIsFertilisedTH(
-                idMateA,
-                idMateB,
-                genMateA,
-                genMateB,
-                mintedSnailsBeforeBreed,
-                txBreedResult
-            )
+            const expected = {
+                fertilisedMateA: false,
+                fertilisedMateB: false
+            }
+            const fertlisationResult = await calcFertilisationTH(txBreedResult)
+            expected.fertilisedMateA = fertlisationResult.expectMateAFertilised
+            expected.fertilisedMateB = fertlisationResult.expectMateBFertilised
 
+/*
+            //*** IF HARDWIRED FERTILISTATION RESULT IN SNAIL SMART CONTRACT ***
+            // *** SET TO BOTH A & B FERTILISED
+            expected.fertilisedMateA = true
+            expected.fertilisedMateB = true
+            // *** SET SO NEITHER A NOR B FERTILISED
+            expected.fertilisedMateA = false
+            expected.fertilisedMateB = false
+            // *** SET SO ONLY A (AND NOT B)) FERTILISED
+            expected.fertilisedMateA = true
+            expected.fertilisedMateB = false
+            // *** SET SO ONLY B (AND NOT A)) FERTILISED
+            expected.fertilisedMateA = false
+            expected.fertilisedMateB = true
+*/
             if (expected.fertilisedMateA || expected.fertilisedMateB) {
             
                 truffleAssert.eventEmitted(txBreedResult, 'SnailsBorn', (ev) => {
