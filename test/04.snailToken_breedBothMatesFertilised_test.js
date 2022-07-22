@@ -19,7 +19,7 @@ const toNumbers = arr => arr.map(Number);
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i])
 
 
-contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accounts => {
+contract("04 SnailToken - Two snails breedBothMatesFertilised", async accounts => {
 
     "use strict"
 
@@ -86,10 +86,10 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
         })
 
 
-        it("should NOT allow breedToAlwaysMintTwoNewSnails if neither mate is present (owned/approved)", async () => {
+        it("should NOT allow breedBothMatesFertilised if neither mate is present (owned/approved)", async () => {
 
             await truffleAssert.reverts(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA - owned by accounts[2]
                     B_SNAIL_ID, //mateB - owned by accounts[2]
                     {from: accounts[0]}
@@ -98,10 +98,10 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             )
         })
 
-        it("should NOT allow breedToAlwaysMintTwoNewSnails if only one mate is present (owned/approved)", async () => {
+        it("should NOT allow breedBothMatesFertilised if only one mate is present (owned/approved)", async () => {
 
             await truffleAssert.reverts(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     C_SNAIL_ID, //mateA - owned by accounts[0]
                     A_SNAIL_ID, //mateB - owned by accounts[2]
                     {from: accounts[2]}
@@ -109,7 +109,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
                 "breed: mateA is not present!"
             )
             await truffleAssert.reverts(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA - owned by accounts[2] 
                     C_SNAIL_ID, //mateB - owned by accounts[0]
                     {from: accounts[2]}
@@ -118,10 +118,10 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             )
         })
 
-        it("should NOT allow a snail to be breedToAlwaysMintTwoNewSnails with itself", async () => {
+        it("should NOT allow a snail to be breedBothMatesFertilised with itself", async () => {
 
             await truffleAssert.reverts(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA
                     A_SNAIL_ID, //mateB
                     {from: accounts[2]}
@@ -178,10 +178,10 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
         })
 
 
-        it("should allow suitable mates to breedToAlwaysMintTwoNewSnails", async () => {
+        it("should allow suitable mates to breedBothMatesFertilised", async () => {
 
             await truffleAssert.passes(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -189,12 +189,12 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             )
         })
 
-        it("should get expected both mates fertilised from each breedToAlwaysMintTwoNewSnails (test 3x)", async () => {
+        it("should get expected both mates fertilised from each breedBothMatesFertilised (test 3x)", async () => {
 
             // Breed (for 1st-time)
             let txBreedResult1
             await truffleAssert.passes(
-                txBreedResult1 = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult1 = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -212,7 +212,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             // Breed for 2nd-time
             let txBreedResult2
             await truffleAssert.passes(
-                txBreedResult2 = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult2 = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -230,7 +230,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             // Breed for 3rd-time
             let txBreedResult3
             await truffleAssert.passes(
-                txBreedResult3 = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult3 = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -246,12 +246,12 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             }, "3. Event SnailsMated event has incorrect/unexpected parameter values!")            
         })
 
-        it("should get expected 2x conceptions from each breedToAlwaysMintTwoNewSnails (test 3x)", async () => {
+        it("should get expected 2x conceptions from each breedBothMatesFertilised (test 3x)", async () => {
 
             // Breed (for the first time)
             let txBreedResult1
             await truffleAssert.passes(
-                txBreedResult1 = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult1 = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -271,7 +271,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             // Breed for 2nd-time
             let txBreedResult2
             await truffleAssert.passes(
-                txBreedResult2 = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult2 = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -291,7 +291,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             // Breed for 3rd-time
             let txBreedResult3
             await truffleAssert.passes(
-                txBreedResult3 = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult3 = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -309,11 +309,11 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             }, "3. Event SnailsMated event has incorrect/unexpected conceptions values!")       
         })
 
-        it("should when there are new-born snails (from breedToAlwaysMintTwoNewSnails), emit a 'SnailsBorn' event", async () => {
+        it("should when there are new-born snails (from breedBothMatesFertilised), emit a 'SnailsBorn' event", async () => {
 
             let txBreedResult
             await truffleAssert.passes(
-                txBreedResult = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA                
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -374,11 +374,11 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             }
         })
 
-        it("should, after breedToAlwaysMintTwoNewSnails indicates new-born snail(s), have minted the expected new snails", async () => {
+        it("should, after breedBothMatesFertilised indicates new-born snail(s), have minted the expected new snails", async () => {
 
             let txBreedResult
             await truffleAssert.passes(
-                txBreedResult = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -417,7 +417,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
 
             let txBreedResult
             await truffleAssert.passes(
-                txBreedResult = await snailToken.breedToAlwaysMintTwoNewSnails(
+                txBreedResult = await snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}),
@@ -483,7 +483,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             await timeMachine.revertToSnapshot(snapshotId)
         })
 
-        it("should NOT breedToAlwaysMintTwoNewSnails when SnailToken contract is in 'paused' state", async () => {
+        it("should NOT breedBothMatesFertilised when SnailToken contract is in 'paused' state", async () => {
 
             // Put contract into 'paused' state
             await truffleAssert.passes(
@@ -491,7 +491,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
                 "Failed to put snailToken contract into 'paused' state!"
             )
             await truffleAssert.reverts(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}
@@ -500,7 +500,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
             )
         })
 
-        it("should allow breedToAlwaysMintTwoNewSnails after 'paused' SnailToken contract is 'unpaused'", async () => {
+        it("should allow breedBothMatesFertilised after 'paused' SnailToken contract is 'unpaused'", async () => {
 
             // Put contract into 'paused' state
             await truffleAssert.passes(
@@ -513,7 +513,7 @@ contract("04 SnailToken - Two snails breedToAlwaysMintTwoNewSnails", async accou
                 "Failed to put snailToken contract into 'unpaused' state!"
             )
             await truffleAssert.passes(
-                snailToken.breedToAlwaysMintTwoNewSnails(
+                snailToken.breedBothMatesFertilised(
                     A_SNAIL_ID, //mateA
                     B_SNAIL_ID, //mateB
                     {from: accounts[2]}
