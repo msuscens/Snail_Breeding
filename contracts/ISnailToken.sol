@@ -59,14 +59,14 @@ interface ISnailToken
 
 
     /*
-    * Breed two snails (who are hermaphrodites), so that either may conceive and mint a new-born snail.
-    * Therefore both, one, or neither of the 2x mating snails may create a new-born snail (as result of breeding)
-    * Note: New-born chance is governed by _FERTILITY_BASE_PERCENTAGE, modified by mate's generations.
+    * Breed two (hermaphrodite) snails, so that either may conceive and give birth to new (minted) snail.
+    * Therefore neither, one, or both of the 2x mating snails may give birth to a snail (as result of breeding)
+    * Note: Fertilisation/conception chance is pseudo-random (from the block timestamp).
     * Requirement: A snail is unable to breed without a mate.
     * Requirement: A snail is unable to mate with itself.
     * Requirement: All mating snails must be present (ie. caller is owner or approver).
-    * Event emitted: SnailsMated (which mates if any are fertilised, with any conception details)
-    * Event emitted: SnailsBorn (only if 1+ new-born snails are minted)
+    * Event emitted: SnailsMated (which mates are fertilised, with the conception details)
+    * Event emitted: SnailsBorn (only if 1+ snails are minted)
     */
     function breed(uint256 mateAId, uint256 mateBId) external;
 
