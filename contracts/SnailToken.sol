@@ -105,6 +105,10 @@ contract SnailToken is
         require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
 
         Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
+        require(
+            conceptions.length <= 2,
+            "breedIE: conceptions>2!"
+        );
     }
 
 
