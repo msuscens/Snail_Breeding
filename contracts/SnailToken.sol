@@ -78,145 +78,8 @@ contract SnailToken is
         require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
         require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
 
-        // Determine which of the two mates conceive and so will give birth to a new-born snail.
-        // NB as snails are hermaphrodites (are both male & femaile), they both may conceive (or only 1 of them or neither)
 
-        // Pseudo-randomly determine who  is fertilised (Mate A and/or Mate B, or neither)
-        uint256 timestamp = block.timestamp;
-        uint256 pseudoRandomA = (timestamp % 10);     //last digit (of timestamp)
-        uint256 pseudoRandomB = (timestamp % 100)/10; //second last digit (of timestamp)
-
-        bool mateAFertilised = (pseudoRandomA % 2) == 1 ? true: false;
-        bool mateBFertilised = (pseudoRandomB % 2) == 1 ? true: false;
-
-
-        Conception[] memory conceptions;
-
-        if (mateAFertilised || mateBFertilised){
-
-            uint256 newGeneration =
-                _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
-                    _snails[snailAId].age.generation+1 :
-                    _snails[snailBId].age.generation+1;
-
-            if (mateAFertilised && mateBFertilised) {
-                conceptions = new Conception[](2);
-
-                conceptions[0] = Conception(
-                    {
-                        generation: newGeneration,
-                        mumId: snailAId, //tokenId
-                        dadId: snailBId  //tokenId
-                    }
-                );
-                conceptions[1] = Conception(
-                    {
-                        generation: newGeneration,
-                        mumId: snailBId, //tokenId
-                        dadId: snailAId  //tokenId
-                    }
-                );
-                require(
-                    conceptions.length == 2,
-                    "breedIE: conceptions!=2!"
-                );
-            }
-            else {
-                conceptions = new Conception[](1);
-
-                if (mateAFertilised && !mateBFertilised) {
-
-                    conceptions[0] = Conception(
-                        {
-                            generation: newGeneration,
-                            mumId: snailAId, //tokenId
-                            dadId: snailBId  //tokenId
-                        }
-                    );
-                }
-                else if (mateBFertilised && !mateAFertilised) {
-                    conceptions[0] = Conception(
-                        {
-                            generation: newGeneration,
-                            mumId: snailBId, //tokenId
-                            dadId: snailAId  //tokenId
-                        }
-                    ); 
-                }
-                else {
-                    revert("Logic error in code");
-                }
-                require(
-                    conceptions.length == 1,
-                    "breedIE: conceptions!=1!"
-                );
-            }
-        }
-        else {
-            require(
-                conceptions.length == 0,
-                "breedIE: conceptions!=0!"
-            );
-        }
-       
-        emit SnailsMated(snailAId, snailBId, mateAFertilised, mateBFertilised, conceptions);
-/*
-        // **** HARDWIRING FERTILISATION RESULT
-        //
-        // uint256 newGeneration =
-        //     _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
-        //         _snails[snailAId].age.generation+1 :
-        //         _snails[snailBId].age.generation+1;
-        //
-        // * SPECIICALLY: ONLY MATE A FERTILISED *
-        // Conception[] memory conceptions = new Conception[](1);
-        // conceptions[0] = Conception(
-        //     {
-        //         generation: newGeneration,
-        //         mumId: snailAId, //tokenId
-        //         dadId: snailBId  //tokenId
-        //     }
-        // );
-        // require(
-        //     conceptions.length == 1,
-        //     "breedIE: conceptions!=1!"
-        // );
-
-        // * SPECIICALLY: ONLY MATE B FERTILISED *
-        // Conception[] memory conceptions = new Conception[](1);
-        // conceptions[0] = Conception(
-        //     {
-        //         generation: newGeneration,
-        //         mumId: snailBId, //tokenId
-        //         dadId: snailAId  //tokenId
-        //     }
-        // );
-        // require(
-        //     conceptions.length == 1,
-        //     "breedIE: conceptions!=1!"
-        // );
-
-        // * SPECIICALLY: BOTH MATES (A & B) FERTILISED *
-        // Conception[] memory conceptions = new Conception[](2);
-        // conceptions[0] = Conception(
-        //     {
-        //         generation: newGeneration,
-        //         mumId: snailAId, //tokenId
-        //         dadId: snailBId  //tokenId
-        //     }
-        // );
-        // conceptions[1] = Conception(
-        //     {
-        //         generation: newGeneration,
-        //         mumId: snailBId, //tokenId
-        //         dadId: snailAId  //tokenId
-        //     }
-        // );
-        // require(
-        //     conceptions.length == 2,
-        //     "breedIE: conceptions!=2!"
-        // );
-*/
+        Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
 
         // Mint any new-born snails
         if (conceptions.length > 0) {
@@ -231,6 +94,135 @@ contract SnailToken is
         }
     }
 
+
+    function breedToConceiveOnly(uint256 snailAId, uint256 snailBId)
+        override
+        external
+        whenNotPaused
+    {
+        require(snailAId != snailBId, "breed: With self!");
+        require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
+        require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
+
+        Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
+    }
+
+
+    function breedToAlwaysMintTwoNewSnails(uint256 snailAId, uint256 snailBId)
+        override
+        external
+        whenNotPaused
+    {
+        require(snailAId != snailBId, "breed: With self!");
+        require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
+        require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
+
+        // Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
+
+        // **** HARDWIRING FERTILISATION RESULT
+        // *** If instead of above psedudo-random code for the fertilisation & associated
+        // *** setting of the conception(s), the fertilisation/conceptions are instead
+        // *** set manaully (to always give either 0, 1, or 2 conceptions) IT WORKS!!!
+        
+        uint256 newGeneration =
+            _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
+                _snails[snailAId].age.generation+1 :
+                _snails[snailBId].age.generation+1;
+        
+
+        // * SPECIICALLY: BOTH MATES (A & B) FERTILISED *
+        Conception[] memory conceptions = new Conception[](2);
+        conceptions[0] = Conception(
+            {
+                generation: newGeneration,
+                mumId: snailAId, //tokenId
+                dadId: snailBId  //tokenId
+            }
+        );
+        conceptions[1] = Conception(
+            {
+                generation: newGeneration,
+                mumId: snailBId, //tokenId
+                dadId: snailAId  //tokenId
+            }
+        );
+        require(
+            conceptions.length == 2,
+            "breedIE: conceptions!=2!"
+        );
+        emit SnailsMated(
+            snailAId,
+            snailBId,
+            true, //mateA fertilised
+            true, //mateB fertilised
+            conceptions
+        );
+
+        // * ALTERNATIVELY SPECIICALLY: ONLY MATE A FERTILISED *
+        // Conception[] memory conceptions = new Conception[](1);
+        // conceptions[0] = Conception(
+        //     {
+        //         generation: newGeneration,
+        //         mumId: snailAId, //tokenId
+        //         dadId: snailBId  //tokenId
+        //     }
+        // );
+        // require(
+        //     conceptions.length == 1,
+        //     "breedIE: conceptions!=1!"
+        // );
+        // emit SnailsMated(
+        //     snailAId,
+        //     snailBId,
+        //     true,  //mateA fertilised
+        //     false, //mateB fertilised
+        //     conceptions
+        // );
+
+        // * ALTERNATIVELY SPECIICALLY: ONLY MATE B FERTILISED *
+        // Conception[] memory conceptions = new Conception[](1);
+        // conceptions[0] = Conception(
+        //     {
+        //         generation: newGeneration,
+        //         mumId: snailBId, //tokenId
+        //         dadId: snailAId  //tokenId
+        //     }
+        // );
+        // require(
+        //     conceptions.length == 1,
+        //     "breedIE: conceptions!=1!"
+        // );
+        // emit SnailsMated(
+        //     snailAId,
+        //     snailBId,
+        //     false, //mateA fertilised
+        //     true,  //mateB fertilised
+        //     conceptions
+        // );
+
+        // * ALTERNATIVELY SPECIICALLY: NEITHER MATE FERTILISED *
+        // Conception[] memory conceptions;
+        // emit SnailsMated(
+        //     snailAId,
+        //     snailBId,
+        //     false, //mateA fertilised
+        //     false, //mateB fertilised
+        //     conceptions
+        // );
+
+
+        // Mint any new-born snails
+        if (conceptions.length > 0) {
+
+            uint256[] memory newBornSnailIds = _mintSnailsTo(msg.sender, conceptions);
+
+            require(
+                newBornSnailIds.length == conceptions.length,
+                "breedIE: conceptions!=newBorns!"
+            );
+            emit SnailsBorn(msg.sender, newBornSnailIds);
+        }
+    }
 
     function getSnail(uint256 snailId)
         override
@@ -341,6 +333,115 @@ contract SnailToken is
 
 
 
+    function _mateSnails(uint256 mateAId, uint256 mateBId)
+        private
+        returns (Conception[] memory conceptions)
+    {
+        // Determine which of the two mates conceive and so will give birth to a new snail.
+        // NB Snails are hermaphrodites (ie. are both male & femaile), they may therefore both 
+        // conceive (or only 1 of them, or neither) and give birth to a new snail.
+
+        // Pseudo-randomly determine which mates (if any) are fertilised
+        uint256 timestamp = block.timestamp;
+        uint256 pseudoRandomA = (timestamp % 10);     //last digit (of timestamp)
+        uint256 pseudoRandomB = (timestamp % 100)/10; //second last digit (of timestamp)
+
+        bool mateAFertilised = (pseudoRandomA % 2) == 1 ? true: false;
+        bool mateBFertilised = (pseudoRandomB % 2) == 1 ? true: false;
+
+        // Gather conception details for new snail(s) if either mate has been fertilised
+        // (ie. one conception record for each mate fertilised, ie. 0-2 conceptions)
+        if (mateAFertilised || mateBFertilised){
+
+            uint256 newGeneration =
+                _snails[mateAId].age.generation > _snails[mateBId].age.generation ?
+                    _snails[mateAId].age.generation+1 :
+                    _snails[mateBId].age.generation+1;
+
+            // Collate conception details for each fertilised mate, ie. 1 or 2 conceptions.
+            conceptions = _matesConceive(
+                        mateAFertilised,
+                        mateBFertilised,
+                        mateAId,
+                        mateBId,
+                        newGeneration
+                    );
+        }
+        emit SnailsMated(
+            mateAId,
+            mateBId,
+            mateAFertilised,
+            mateBFertilised,
+            conceptions
+        );
+    }
+
+
+    function _matesConceive(
+        bool mateAFertilised,
+        bool mateBFertilised,
+        uint256 mateAId,
+        uint256 mateBId,
+        uint256 newGeneration
+    )
+        private
+        pure
+        returns (Conception[] memory conceptions)
+    {
+        require(
+            mateAFertilised || mateBFertilised,
+            "_matesConceiveIE: Neither mate fertilised!"
+        );
+
+        if (mateAFertilised && mateBFertilised) {
+            conceptions = new Conception[](2);
+
+            conceptions[0] = Conception(
+                {
+                    generation: newGeneration,
+                    mumId: mateAId, //snail tokenId
+                    dadId: mateBId  //snail tokenId
+                }
+            );
+            conceptions[1] = Conception(
+                {
+                    generation: newGeneration,
+                    mumId: mateBId, //snail tokenId
+                    dadId: mateAId  //snail tokenId
+                }
+            );
+        }
+        else {
+            conceptions = new Conception[](1);
+
+            if (mateAFertilised && !mateBFertilised) {
+                conceptions[0] = Conception(
+                    {
+                        generation: newGeneration,
+                        mumId: mateAId, //snail tokenId
+                        dadId: mateBId  //snail tokenId
+                    }
+                );
+            }
+            else if (mateBFertilised && !mateAFertilised) {
+                conceptions[0] = Conception(
+                    {
+                        generation: newGeneration,
+                        mumId: mateBId, //snail tokenId
+                        dadId: mateAId  //snail tokenId
+                    }
+                ); 
+            }
+            else {
+                revert("_matesConceiveIE: Logic error in code");
+            }
+        }
+    }
+
+
+    // -----------------------------------------------
+    // *** Relationship Checking (View) Functions  ***
+    
     function _isExPartner(
         uint256 snailId, 
         uint256 toSnailId

@@ -65,9 +65,24 @@ interface ISnailToken
     * Requirement: A snail is unable to breed without a mate.
     * Requirement: A snail is unable to mate with itself.
     * Requirement: All mating snails must be present (ie. caller is owner or approver).
+    * Event emitted: SnailsMated (which mates if any are fertilised, with any conception details)
     * Event emitted: SnailsBorn (only if 1+ new-born snails are minted)
     */
     function breed(uint256 mateAId, uint256 mateBId) external;
+
+    /* As breed function above BUT after pseudo-randomly determining which mate(s)
+     * (if any) are fertilised together with the conception details, it completes and
+     * doesn't mint any newly conceived snails and therefore never emits a SnailsBorn event
+     */   
+    function breedToConceiveOnly(uint256 mateAId, uint256 mateBId) external;
+
+    /* As breed function above BUT instead of pseudo-randomly determining which mate(s)
+     * (if any) are fertilised, it sets both mates to be fertalised and hence conceive.
+     * Hence two new snails are always minted, one from each mate.
+    * Event emitted: SnailsMated - Always with both mates fertilised, with their any conception details
+    * Event emitted: SnailsBorn - Always with 2x new-born snails minted
+    */  
+    function breedToAlwaysMintTwoNewSnails(uint256 mateAId, uint256 mateBId) external;
 
     /*
     * Get all the Snail's details of the specified snail token.
