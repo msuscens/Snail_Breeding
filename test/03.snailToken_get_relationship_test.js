@@ -16,7 +16,7 @@ const SNAIL_TOKEN_NAME = "Snail Token"
 const SNAIL_TOKEN_SYMBOL = "SNL"
 
 
-contract.skip("03 SnailToken - Get Relationship between two snails", async accounts => {
+contract("03 SnailToken - Get Relationship between two snails", async accounts => {
 
     "use strict"
 
@@ -224,7 +224,7 @@ contract.skip("03 SnailToken - Get Relationship between two snails", async accou
             assert.deepStrictEqual(
                 Number(value),
                 Relationship.Mother,
-                `Expected to be 'Mother' but rather Snail (id:${F_SNAIL_ID}) has Relationship.${relationship} to snail (id:${V_SNAIL_ID})!!`
+                `Expected to be 'Mother' but rather Snail (id:${F_SNAIL_ID}) has Relationship.${relationship} to snail (id:${J_SNAIL_ID})!!`
             )
         })
 
@@ -262,7 +262,7 @@ contract.skip("03 SnailToken - Get Relationship between two snails", async accou
             assert.deepStrictEqual(
                 Number(value),
                 Relationship.Father,
-                `Expected to be 'Father' but rather Snail (id:${H_SNAIL_ID}) has Relationship.${relationship} to snail (id:${V_SNAIL_ID})!!`
+                `Expected to be 'Father' but rather Snail (id:${H_SNAIL_ID}) has Relationship.${relationship} to snail (id:${J_SNAIL_ID})!!`
             )
         })
     
