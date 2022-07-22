@@ -89,6 +89,26 @@ interface ISnailToken
     */  
     function breedBothMatesFertilised(uint256 mateAId, uint256 mateBId) external;
 
+    /* As breed function above BUT instead of pseudo-randomly determining which mate(s)
+     * (if any) are fertilised, it sets only mate A to be fertalised and hence conceive.
+     * Hence one new snail is always minted, ie. mate A is the mother.
+     * Event emitted: SnailsMated - Always with only mate A fertilised and 1x conception
+     * Event emitted: SnailsBorn - Always with 1x new-born snail minted.
+     * NOTE: This function is purely for debugging puposes ie. to prove (with test scripts) 
+     * that this hardwired non-pseduo-random case of the breed functionality works.
+    */  
+    function breedMateAFertilised(uint256 mateAId, uint256 mateBId) external;
+
+    /* As breed function above BUT instead of pseudo-randomly determining which mate(s)
+     * (if any) are fertilised, it sets only mate B to be fertalised and hence conceive.
+     * Hence one new snail is always minted, ie. mate B is the mother.
+     * Event emitted: SnailsMated - Always with only mate B fertilised and 1x conception
+     * Event emitted: SnailsBorn - Always with 1x new-born snail minted.
+     * NOTE: This function is purely for debugging puposes ie. to prove (with test scripts) 
+     * that this hardwired non-pseduo-random case of the breed functionality works.
+    */  
+    function breedMateBFertilised(uint256 mateAId, uint256 mateBId) external;
+
     /*
     * Get all the Snail's details of the specified snail token.
     * Throws if the specified snail doesn't exist
