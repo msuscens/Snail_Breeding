@@ -72,17 +72,22 @@ interface ISnailToken
 
     /* As breed function above BUT after pseudo-randomly determining which mate(s)
      * (if any) are fertilised together with the conception details, it completes and
-     * doesn't mint any newly conceived snails and therefore never emits a SnailsBorn event
+     * doesn't mint any newly conceived snails (and therefore never emits a SnailsBorn event).
+     * Event emitted: SnailsMated (which mates are fertilised, with the conception details)
+     * NOTE: This function is purely for debugging puposes ie. to prove (with test scripts) 
+     * that this part of the breed functionality works in issolation.
      */   
     function breedToConceiveOnly(uint256 mateAId, uint256 mateBId) external;
 
     /* As breed function above BUT instead of pseudo-randomly determining which mate(s)
      * (if any) are fertilised, it sets both mates to be fertalised and hence conceive.
      * Hence two new snails are always minted, one from each mate.
-    * Event emitted: SnailsMated - Always with both mates fertilised, with their any conception details
-    * Event emitted: SnailsBorn - Always with 2x new-born snails minted
+     * Event emitted: SnailsMated - Always with both mates fertilised, with their any conception details
+     * Event emitted: SnailsBorn - Always with 2x new-born snails minted.
+     * NOTE: This function is purely for debugging puposes ie. to prove (with test scripts) 
+     * that this part of the breed functionality works in issolation.
     */  
-    function breedToAlwaysMintTwoNewSnails(uint256 mateAId, uint256 mateBId) external;
+    function breedBothMatesFertilised(uint256 mateAId, uint256 mateBId) external;
 
     /*
     * Get all the Snail's details of the specified snail token.
