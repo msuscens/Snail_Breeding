@@ -15,7 +15,7 @@ const SNAIL_TOKEN_NAME = "Snail Token"
 const SNAIL_TOKEN_SYMBOL = "SNL"
 
 
-contract("07 SnailToken - Get Relationship between two snails", async accounts => {
+contract.skip("07 SnailToken - Get Relationship between two snails", async accounts => {
 
     "use strict"
 

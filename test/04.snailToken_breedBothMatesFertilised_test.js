@@ -15,7 +15,7 @@ const toNumbers = arr => arr.map(Number);
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i])
 
 
-contract("04 SnailToken - Two snails breedBothMatesFertilised", async accounts => {
+contract.skip("04 SnailToken - Two snails breedBothMatesFertilised", async accounts => {
 
     "use strict"
 

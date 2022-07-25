@@ -13,7 +13,7 @@ const SNAIL_TOKEN_NAME = "Snail Token"
 const SNAIL_TOKEN_SYMBOL = "SNL"
 
 
-contract("03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)", async accounts => {
+contract.skip("03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)", async accounts => {
 
     "use strict"
 
