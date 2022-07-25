@@ -2,12 +2,11 @@
 // Written by Mark Suscens, Copyright 2022, all rights reserved.
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./ISnailToken.sol";
 
@@ -17,15 +16,12 @@ bytes4 constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 bytes4 constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
 // Note: bytes4(keccak256('supportsInterface(bytes4) == 0x01ffc9a7'));
 
-
-
 contract SnailToken is
-    Initializable,
-    ERC721Upgradeable,
-    ERC721EnumerableUpgradeable,
-    ERC721HolderUpgradeable,
-    PausableUpgradeable,
-    OwnableUpgradeable,
+    ERC721,
+    ERC721Enumerable,
+    // ERC721Holder,
+    Pausable,
+    Ownable,
     ISnailToken
 {
     // Mapping from snail's tokenId => Snail record 
@@ -34,20 +30,11 @@ contract SnailToken is
 
 
 // Constructor
-    // Initializer for the upgradeable contract (instead of constructor) 
-    // that can only be executed once (that must be done upon deployment)
-    function init_SnailToken(
+    constructor (
         string memory tokenName, 
         string memory tokenSymbol
-    )
-        public
-        initializer
+    ) ERC721(tokenName, tokenSymbol)
     {
-        __ERC721_init(tokenName, tokenSymbol);
-        __ERC721Enumerable_init();
-        __ERC721Holder_init();
-        __Pausable_init();
-        __Ownable_init();
     }
 
 
@@ -95,6 +82,11 @@ contract SnailToken is
     }
 
 
+    // *** FOLLOWING FUNCTION IS FOR TESTING/DEBUGING ONLY
+    // *** Version of Breed() - see above - that pseudo-randomly calculates the snail conceptions,
+    // *** using _mateSnails(, but doesn't go on to mint new (baby) smails from these conceptions.
+    // *** (See ISnail.sol file for a description of all external functions)
+     // NB: This function works as expected (unlike breed() function) - see test script: 03.snailToken_breedToConceiveOnly_test.js
     function breedToConceiveOnly(uint256 snailAId, uint256 snailBId)
         override
         external
@@ -111,7 +103,12 @@ contract SnailToken is
         );
     }
 
-
+    // *** FOLLOWING FUNCTION IS FOR TESTING/DEBUGING ONLY:
+    // *** Version of Breed() - see above - that always creates 2x snail conceptions
+    // *** (ie. _mateSnails() is not used to pseudo-randomly determine number of conceptions).
+    // *** It then goes onto sucessfully mint two newly conceived snails (using same code as breed()).
+    // *** (See ISnail.sol file for a description of all external functions)
+    // NB: This function works as expected (unlike breed() function) - see test script: 04.snailToken_breedBothMatesFertilised_test.js 
     function breedBothMatesFertilised(uint256 snailAId, uint256 snailBId)
         override
         external
@@ -121,13 +118,9 @@ contract SnailToken is
         require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
         require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
 
+        // **** HARDWIRING FERTILISATION RESULT - SO _mateSnails() commented out
         // Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
 
-        // **** HARDWIRING FERTILISATION RESULT
-        // *** If instead of above psedudo-random code for the fertilisation & associated
-        // *** setting of the conception(s), the fertilisation/conceptions are instead
-        // *** set manaully (to always give either 0, 1, or 2 conceptions) IT WORKS!!!
-        
         uint256 newGeneration =
             _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
                 _snails[snailAId].age.generation+1 :
@@ -175,7 +168,12 @@ contract SnailToken is
         }
     }
 
-
+    // *** FOLLOWING FUNCTION IS FOR TESTING/DEBUGING ONLY
+    // *** Version of Breed() - see above - that always creates 1x snail conception for Mate A only
+    // *** (ie. _mateSnails() is not used to pseudo-randomly determine number of conceptions).
+    // *** It then goes onto sucessfully mint one newly conceived snail (using same code as breed()).
+    // *** (See ISnail.sol file for a description of all external functions)
+    // NB: This function works as expected (unlike breed() function) - see test script: 05.snailToken_breedMateAFertilised_test.js 
     function breedMateAFertilised(uint256 snailAId, uint256 snailBId)
         override
         external
@@ -185,12 +183,8 @@ contract SnailToken is
         require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
         require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
 
+        // **** HARDWIRING FERTILISATION RESULT - SO _mateSnails() commented out
         // Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
-
-        // **** HARDWIRING FERTILISATION RESULT
-        // *** If instead of above psedudo-random code for the fertilisation & associated
-        // *** setting of the conception(s), the fertilisation/conceptions are instead
-        // *** set manaully (to always give either 0, 1, or 2 conceptions) IT WORKS!!!
         
         uint256 newGeneration =
             _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
@@ -231,7 +225,12 @@ contract SnailToken is
         }
     }
 
-
+    // *** FOLLOWING FUNCTION IS FOR TESTING/DEBUGING ONLY
+    // *** Version of Breed() - see above - that always creates 1x snail conception for Mate B only
+    // *** (ie. _mateSnails() is not used to pseudo-randomly determine number of conceptions).
+    // *** It then goes onto sucessfully mint one newly conceived snail (using same code as breed()).
+    // *** (See ISnail.sol file for a description of all external functions)
+    // NB: This function works as expected (unlike breed() function) - see test script: 06.snailToken_breedMateBFertilised_test.js 
     function breedMateBFertilised(uint256 snailAId, uint256 snailBId)
         override
         external
@@ -241,12 +240,8 @@ contract SnailToken is
         require(_isApprovedOrOwner(msg.sender, snailAId), "breed: mateA is not present!");
         require(_isApprovedOrOwner(msg.sender, snailBId), "breed: mateB is not present!");
 
+        // **** HARDWIRING FERTILISATION RESULT - SO _mateSnails() commented out
         // Conception[] memory conceptions = _mateSnails(snailAId, snailBId);
-
-        // **** HARDWIRING FERTILISATION RESULT
-        // *** If instead of above psedudo-random code for the fertilisation & associated
-        // *** setting of the conception(s), the fertilisation/conceptions are instead
-        // *** set manaully (to always give 1, or 2 conceptions) IT WORKS!!!
         
         uint256 newGeneration =
             _snails[snailAId].age.generation > _snails[snailBId].age.generation ?
@@ -331,8 +326,10 @@ contract SnailToken is
         view
         virtual
         override(
-            ERC721Upgradeable,
-            ERC721EnumerableUpgradeable
+            // ERC721Upgradeable,
+            // ERC721EnumerableUpgradeable
+            ERC721,
+            ERC721Enumerable
         )
         returns (bool)
     {
@@ -350,8 +347,10 @@ contract SnailToken is
         internal
         virtual
         override(
-            ERC721Upgradeable,
-            ERC721EnumerableUpgradeable
+            // ERC721Upgradeable,
+            // ERC721EnumerableUpgradeable
+            ERC721,
+            ERC721Enumerable
         )
         whenNotPaused
     {

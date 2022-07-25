@@ -2,12 +2,10 @@
 // Written by Mark Suscens, Copyright 2022, all rights reserved.
 
 const truffleAssert = require("truffle-assertions")
-const { deployProxy } = require('@openzeppelin/truffle-upgrades')
 
 const SnailToken = artifacts.require("SnailToken")
-
-const PERSON_TOKEN_NAME = "Snail Token"
-const PERSON_TOKEN_SYMBOL = "PT"
+const SNAIL_TOKEN_NAME = "Snail Token"
+const SNAIL_TOKEN_SYMBOL = "PT"
 
 
 contract("01 SnailToken State - Newly minted snail", async accounts => {
@@ -19,15 +17,7 @@ contract("01 SnailToken State - Newly minted snail", async accounts => {
     before("Deploy SnailToken contract", async function() {
 
         await truffleAssert.passes(
-            snailToken = await deployProxy(
-                SnailToken,
-                [
-                    PERSON_TOKEN_NAME,
-                    PERSON_TOKEN_SYMBOL
-                ],
-                {initializer: 'init_SnailToken', from: accounts[0]}
-            ),
-            "Failed to deployProxy for SnailToken contract"
+            snailToken = await SnailToken.deployed(SNAIL_TOKEN_NAME, SNAIL_TOKEN_SYMBOL)
         )
     })
 

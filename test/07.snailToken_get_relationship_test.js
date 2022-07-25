@@ -2,7 +2,6 @@
 // Written by Mark Suscens, Copyright 2022, all rights reserved.
 
 const truffleAssert = require("truffle-assertions")
-const { deployProxy } = require('@openzeppelin/truffle-upgrades')
 const timeMachine = require('ganache-time-traveler')
 
 
@@ -25,15 +24,7 @@ contract("07 SnailToken - Get Relationship between two snails", async accounts =
     before("Deploy SnailToken contract", async function() {
 
         await truffleAssert.passes(
-            snailToken = await deployProxy(
-                SnailToken,
-                [
-                    SNAIL_TOKEN_NAME,
-                    SNAIL_TOKEN_SYMBOL
-                ],
-                {initializer: 'init_SnailToken', from: accounts[0]}
-            ),
-            "Failed to deployProxy for SnailToken contract"
+            snailToken = await SnailToken.deployed(SNAIL_TOKEN_NAME, SNAIL_TOKEN_SYMBOL)
         )
     })
 
