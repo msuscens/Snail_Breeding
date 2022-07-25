@@ -49,6 +49,90 @@ Hence I think that I've proved that the issue is related to the pseudo-randomnes
     Note: Under test "should allow suitable mates to breedToConceiveOnly" that for each of 3x calls the fertilisation/conceptions occur pseudo-randonly and hence typically give different conceptions for each run.
 
 
+        Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
+    Breed Snails: Both mates must be present
+      ✓ should NOT allow breedToConceiveOnly if neither mate is present (owned/approved)
+      ✓ should NOT allow breedToConceiveOnly if only one mate is present (owned/approved) (63ms)
+      ✓ should NOT allow a snail to be breedToConceiveOnly with itself
+    Breed Two Snails (with pseudo-random chance that each mate produces 1x newborn smail): 
+      ✓ should allow suitable mates to breedToConceiveOnly
+        1. Actual fertilisation result, mate A: false; mate B: false
+        1. Expect fertilisation result, mate A: false; mate B: false
+        2. Actual fertilisation result, mate A: true; mate B: false
+        2. Expect fertilisation result, mate A: true; mate B: false
+        3. Actual fertilisation result, mate A: false; mate B: true
+        3. Expect fertilisation result, mate A: false; mate B: true
+      ✓ should get expected (pseudo-random) fertilisation from each breedToConceiveOnly (test for 3x breeds) (126ms)
+        Breed 1: No conceptions
+        Breed 2: 1x conceptions - mateA only
+        Breed 3: 1x conceptions - mateB only
+      ✓ should get expected (pseudo-random) conception result from each breedToConceiveOnly (test for 3x breeds) (101ms)
+    Snail breedToConceiveOnly: Pausing  & Unpausing the SnailToken Contract
+      ✓ should NOT breedToConceiveOnly when SnailToken contract is in 'paused' state (49ms)
+      ✓ should allow breedToConceiveOnly after 'paused' SnailToken contract is 'unpaused' (90ms)
+
+  Contract: 04 SnailToken - Two snails breedBothMatesFertilised
+    Breed Snails: Both mates must be present
+      ✓ should NOT allow breedBothMatesFertilised if neither mate is present (owned/approved)
+      ✓ should NOT allow breedBothMatesFertilised if only one mate is present (owned/approved) (85ms)
+      ✓ should NOT allow a snail to be breedBothMatesFertilised with itself
+    Breed Two Snails (with pseudo-random chance that each mate produces 1x newborn smail): 
+      ✓ should allow suitable mates to breedBothMatesFertilised (174ms)
+        1. Actual fertilisation result, mate A: true; mate B: true
+        2. Actual fertilisation result, mate A: true; mate B: true
+        3. Actual fertilisation result, mate A: true; mate B: true
+      ✓ should get expected both mates fertilised from each breedBothMatesFertilised (test 3x) (364ms)
+      ✓ should get expected 2x conceptions from each breedBothMatesFertilised (test 3x) (217ms)
+        Expected both mateA & mateB to have a baby snail...
+      ✓ should when there are new-born snails (from breedBothMatesFertilised), emit a 'SnailsBorn' event (70ms)
+      ✓ should, after breedBothMatesFertilised indicates new-born snail(s), have minted the expected new snails (69ms)
+      ✓ should have (for any) new-born snails have the correct parents identified (102ms)
+    Snail Breeding: Pausing  & Unpausing the SnailToken Contract
+      ✓ should NOT breedBothMatesFertilised when SnailToken contract is in 'paused' state (45ms)
+      ✓ should allow breedBothMatesFertilised after 'paused' SnailToken contract is 'unpaused' (141ms)
+
+  Contract: 05 SnailToken - Two snails breedMateAFertilised
+    Breed Snails: Both mates must be present
+      ✓ should NOT allow breedMateAFertilised if neither mate is present (owned/approved)
+      ✓ should NOT allow breedMateAFertilised if only one mate is present (owned/approved) (46ms)
+      ✓ should NOT allow a snail to be breedMateAFertilised with itself
+    Breed Two Snails (with pseudo-random chance that each mate produces 1x newborn smail): 
+      ✓ should allow suitable mates to breedMateAFertilised (60ms)
+        1. Actual fertilisation result, mate A: true; mate B: false
+        2. Actual fertilisation result, mate A: true; mate B: false
+        3. Actual fertilisation result, mate A: true; mate B: false
+      ✓ should get expected mates A fertilised from each breedMateAFertilised (test 3x) (170ms)
+      ✓ should get expected 1x conception from each breedMateAFertilised (test 3x) (152ms)
+        Expected only mateA to have a baby snail...
+      ✓ should when there are new-born snails (from breedMateAFertilised), emit a 'SnailsBorn' event (58ms)
+      ✓ should, after breedMateAFertilised indicates new-born snail(s), have minted the expected new snails (59ms)
+      ✓ should have (for any) new-born snails have the correct parents identified (45ms)
+    Snail Breeding: Pausing  & Unpausing the SnailToken Contract
+      ✓ should NOT breedMateAFertilised when SnailToken contract is in 'paused' state
+      ✓ should allow breedMateAFertilised after 'paused' SnailToken contract is 'unpaused' (98ms)
+
+  Contract: 06 SnailToken - Two snails breedMateBFertilised
+    Breed Snails: Both mates must be present
+      ✓ should NOT allow breedMateBFertilised if neither mate is present (owned/approved)
+      ✓ should NOT allow breedMateBFertilised if only one mate is present (owned/approved) (40ms)
+      ✓ should NOT allow a snail to be breedMateBFertilised with itself
+    Breed Two Snails (with pseudo-random chance that each mate produces 1x newborn smail): 
+      ✓ should allow suitable mates to breedMateBFertilised (42ms)
+        1. Actual fertilisation result, mate A: false; mate B: true
+        2. Actual fertilisation result, mate A: false; mate B: true
+        3. Actual fertilisation result, mate A: false; mate B: true
+      ✓ should get expected mates A fertilised from each breedMateBFertilised (test 3x) (127ms)
+      ✓ should get expected 1x conception from each breedMateBFertilised (test 3x) (182ms)
+        Expected only mateB to have a baby snail...
+      ✓ should when there are new-born snails (from breedMateBFertilised), emit a 'SnailsBorn' event (59ms)
+      ✓ should, after breedMateBFertilised indicates new-born snail(s), have minted the expected new snails (55ms)
+      ✓ should have (for any) new-born snails have the correct parents identified (57ms)
+    Snail Breeding: Pausing  & Unpausing the SnailToken Contract
+      ✓ should NOT breedMateBFertilised when SnailToken contract is in 'paused' state (48ms)
+      ✓ should allow breedMateBFertilised after 'paused' SnailToken contract is 'unpaused' (88ms)
+
+  41 passing (5s)
+
   Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
     Breed Snails: Both mates must be present
       ✓ should NOT allow breedToConceiveOnly if neither mate is present (owned/approved)
