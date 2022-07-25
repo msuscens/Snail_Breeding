@@ -8,7 +8,7 @@ const SNAIL_TOKEN_NAME = "Snail Token"
 const SNAIL_TOKEN_SYMBOL = "PT"
 
 
-contract("01 SnailToken State - Newly minted snail", async accounts => {
+contract("01 SnailToken - MintSnailsTo (given a snail 'conception')", async accounts => {
 
     "use strict"
 
