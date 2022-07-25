@@ -19,7 +19,6 @@ bytes4 constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
 contract SnailToken is
     ERC721,
     ERC721Enumerable,
-    // ERC721Holder,
     Pausable,
     Ownable,
     ISnailToken
