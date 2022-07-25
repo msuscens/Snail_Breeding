@@ -8,19 +8,20 @@ When a new snail is minted it includes a record of its parents (mumId and dadId)
 new snails that are minted using this function directly have unknown parants (with mumId & dadId both set to 0)
 and the snail's generation is set to 0 (see 'Generations' below.)
 
-BREEDING:
-Snails are hamaphropdites (ie. are both male & female) and so upon mating either may conceive (and create one new snail).
-Specificaly two snail tokens may be mated together using the breed() function, with a pseudo-random chance that each snail
-gives birth to new snail token.  Therefore upon two snails breeding, 0, 1, or 2 new snails may be born (minted) - ie.
-there are 4 possible outcomes from a call to breed(snailA, snailB):
- 1. Neither snail conceives - no new sanils are minted
+BREEDING SNAILS:
+Snails are hamaphropdites (ie. are both male & female) and so upon mating either may be fertilised/conceive and
+give birth to a one new snail).
+Specificaly two snail tokens may be mated together using the breed() function, with a pseudo-random chance that 
+each snail gives birth to new snail token.  Therefore upon two snails breeding, either 0, 1, or 2 new snails are 
+born (minted) - ie. there are 4 possible outcomes from a call to breed(snailA, snailB):
+ 1. Neither snail conceives - no new snails are minted
  2. Only snail mateA conceives - 1x new snail are minted
  3. Only snail mateB conceives - 1x new snail are minted
  4. Both snail mate A & B conceive - 2x new snails are minted
 
-The parents of newly minted Snail are known & stored (ie. new snail's mum & dad).
+The parents of a newly minted Snail are known & stored (ie. the new snail's 'mum' & 'dad').
 
-Generation: Each snail token has a generation (Gen).  When two snails are breed together then any new snails 
+Generation: Each snail token has a generation (Gen).  When two snails breed then any new snails 
 that are born will be of a later generation, eg. 2x Gen-0 snails breed to produce Gen-1 snails.
 
 THE ISSUE - With ganache upon using pseudo-randomness within a function (that determines what functions are minted)
