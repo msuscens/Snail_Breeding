@@ -23,29 +23,29 @@ The parents of newly minted Snail are known & stored (ie. new snail's mum & dad)
 Generation: Each snail token has a generation (Gen).  When two snails are breed together then any new snails 
 that are born will be of a later generation, eg. 2x Gen-0 snails breed to produce Gen-1 snails.
 
-THE ISSUE
-1.  Breed function executes the first time it is called, but on subsequent calls it reverts (for an unknown reason)
-2.  This seems to be due to the pseudo-random outcome - ie. either 0, 1, or 2 new snails may be minted.
-3.  It is unclear to me why this is the case - similar breed functions that always creates 0, 1 or 2 new snails
-    (instead of pseudo-randomly producing one of these results) all work correctly.  I prove this with test functions:
+THE ISSUE - With ganache upon using pseudo-randomness within a function (that determines what functions are minted)
+1.  The breed() function sometimes executes the first time it is called but other times it fails upon first call. On subsequent calls it reverts (for an unknown reason).  The issue therefore lies when executing breed() with Ganache.
+2.  This breed() revert seems to be due to breed's pseudo-random outcome - ie. either 0, 1, or 2 new snails may be minted as a result of calling breed to mate two snails.
+3.  It is unclear why this revert occurs and why it sometime complete sucessfully.  I've coded similar breed-like test functions that always creates 0, 1 or 2 new snails (ie. a fixed number of new tokens minted) and all work correctly. 
+Hence I think I've proved that the issue is related to the pseudo-randomness of results in any execution of breed. These breed-like test functions are:
       i.   breedBothMatesFertilised(snailA, snailB)  
       ii.  breedMateAFertilised(snailA, snailB) 
       iii. breedMateBFertilised(snailA, snailB) 
-    These 3 non-random functions always produce a specific number of newly minted snails and there associated Truffle tests all function correctly, ie. the test scripts:
+    These non-random functions always produce a specific number of newly minted snails and their associated Truffle tests, ie. the test scripts:
       i.   04.snailToken_breedBothMatesFertilised_test.js
       ii.  05.snailToken_breedMateAFertilised_test.js
       iii. 06.snailToken_breedMateBFertilised_test.js
-    (These Tests are refactored copies of the breed() truffle tests: 02_snailToken_breed_test.js)
+    These Tests are refactored copies of the breed() truffle tests: 02_snailToken_breed_test.js.  These test functions/test always pass, functioning as expected.
 
-    Similarly I created a test function breedToConceiveOnly(snailA, snailB) that breeds two snails to produce a
-    pseudo-random conception result (as does breed()) but then completes without minting any snails.
-    It has an associated test script 03.snailToken_breedToConceiveOnly_test.js
+    Similarly I created another test function breedToConceiveOnly(snailA, snailB) that breeds two snails to produce a
+    pseudo-random fertilisation/conception result (as does the breed() function) but then ends without minting any snails. It has an associated test script 03.snailToken_breedToConceiveOnly_test.js
+    This function / test script always passes and hence also always functions as expected.
 
-    All these test scripts function as expected.  
+    Bottom line: All of these test functions/test-scripts function as expected.  And hence I've checked the discrete parts of code (employed by breed) and all function as expected.  The issue therefore is when breed() itself is executed that uses all these steps together - ie. pseudo-randomly determines which of the two snails conceive and then mints the appropraite number of newly conceived snail tokens.  
 
     TEST RUN OUTPUT (Executing just these 4 truffle test files)
 
-    (Note under test "should allow suitable mates to breedToConceiveOnly" that for each of 3x calls the fertilisation/conceptions occure pseudo-randonly and hence typically give different conceptions for each run)
+    Note: Under test "should allow suitable mates to breedToConceiveOnly" that for each of 3x calls the fertilisation/conceptions occur pseudo-randonly and hence typically give different conceptions for each run.
 
       Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
     Breed Snails: Both mates must be present
