@@ -48,7 +48,8 @@ Hence I think that I've proved that the issue is related to the pseudo-randomnes
 
     Note: Under test "should allow suitable mates to breedToConceiveOnly" that for each of 3x calls the fertilisation/conceptions occur pseudo-randonly and hence typically give different conceptions for each run.
 
-<!--   Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
+
+        Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
     Breed Snails: Both mates must be present
       ✓ should NOT allow breedToConceiveOnly if neither mate is present (owned/approved)
       ✓ should NOT allow breedToConceiveOnly if only one mate is present (owned/approved) (63ms)
@@ -130,7 +131,7 @@ Hence I think that I've proved that the issue is related to the pseudo-randomnes
       ✓ should NOT breedMateBFertilised when SnailToken contract is in 'paused' state (48ms)
       ✓ should allow breedMateBFertilised after 'paused' SnailToken contract is 'unpaused' (88ms)
 
-  41 passing (5s) -->
+  41 passing (5s)
 
         Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
       Breed Snails: Both mates must be present
