@@ -24,19 +24,19 @@ The parents of a newly minted Snail are known & stored (ie. the new snail's 'mum
 Generation: Each snail token has a generation (Gen).  When two snails breed then any new snails 
 that are born will be of a later generation, eg. 2x Gen-0 snails breed to produce Gen-1 snails.
 
-THE ISSUE - With ganache upon using pseudo-randomness within a function (that determines what functions are minted)
-1.  The breed() function sometimes executes the first time it is called but other times it fails upon first call. On subsequent calls it reverts (for an unknown reason).  The issue therefore lies when executing breed() with Ganache.
-2.  This breed() revert seems to be due to breed's pseudo-random outcome - ie. either 0, 1, or 2 new snails may be minted as a result of calling breed to mate two snails.
-3.  It is unclear why this revert occurs and why it sometime complete sucessfully.  I've coded similar breed-like test functions that always creates 0, 1 or 2 new snails (ie. a fixed number of new tokens minted) and all work correctly. 
-Hence I think I've proved that the issue is related to the pseudo-randomness of results in any execution of breed. These breed-like test functions are:
+THE ISSUE - Pseudo-randomness used in breed function (that determines what further ERC721 tokens are minted)
+1.  The breed() function sometimes executes the first time it is called but other times it fails upon first call. On subsequent calls breed() reverts (for an unknown reason).
+2.  This breed() revert seems to be due to breed's pseudo-random outcome - ie. either 0, 1, or 2 new ERC721 snail token may be minted.
+3.  Why does this revert occurs and why it sometime complete sucessfully?  I've coded similar breed-like test functions that always creates 0, 1 or 2 new snails (ie. a fixed number of new tokens minted) and all work correctly. 
+Hence I think that I've proved that the issue is related to the pseudo-randomness of minting new (ERC721) tokens during the execution of breed. These breed-like test functions (that give fixed non-random results) are:
       i.   breedBothMatesFertilised(snailA, snailB)  
       ii.  breedMateAFertilised(snailA, snailB) 
       iii. breedMateBFertilised(snailA, snailB) 
-    These non-random functions always produce a specific number of newly minted snails and their associated Truffle tests, ie. the test scripts:
+    They always sucessfully produce a specific number of newly minted snails, proven by Truffle tests in:
       i.   04.snailToken_breedBothMatesFertilised_test.js
       ii.  05.snailToken_breedMateAFertilised_test.js
       iii. 06.snailToken_breedMateBFertilised_test.js
-    These Tests are refactored copies of the breed() truffle tests: 02_snailToken_breed_test.js.  These test functions/test always pass, functioning as expected.
+    Note: These Tests are refactored copies of the breed() truffle test (02_snailToken_breed_test.js).
 
     Similarly I created another test function breedToConceiveOnly(snailA, snailB) that breeds two snails to produce a
     pseudo-random fertilisation/conception result (as does the breed() function) but then ends without minting any snails. It has an associated test script 03.snailToken_breedToConceiveOnly_test.js
@@ -48,7 +48,7 @@ Hence I think I've proved that the issue is related to the pseudo-randomness of 
 
     Note: Under test "should allow suitable mates to breedToConceiveOnly" that for each of 3x calls the fertilisation/conceptions occur pseudo-randonly and hence typically give different conceptions for each run.
 
-      Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
+<!--   Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
     Breed Snails: Both mates must be present
       ✓ should NOT allow breedToConceiveOnly if neither mate is present (owned/approved)
       ✓ should NOT allow breedToConceiveOnly if only one mate is present (owned/approved) (63ms)
@@ -130,8 +130,7 @@ Hence I think I've proved that the issue is related to the pseudo-randomness of 
       ✓ should NOT breedMateBFertilised when SnailToken contract is in 'paused' state (48ms)
       ✓ should allow breedMateBFertilised after 'paused' SnailToken contract is 'unpaused' (88ms)
 
-
-  41 passing (5s)
+  41 passing (5s) -->
 
         Contract: 03 SnailToken - Two snails breedToConceiveOnly (no new snails born/minted)
       Breed Snails: Both mates must be present
