@@ -27,7 +27,7 @@ contract("01 SnailToken - MintSnailsTo (given a snail 'conception')", async acco
         )
     })
 
-    describe("Minted Gen-0 Snails: Check expected State", () => {
+    describe("Minted Gen-0 Snails: Check their state", () => {
 
         let tx1Result
         let tx1BlockObject
@@ -137,7 +137,7 @@ contract("01 SnailToken - MintSnailsTo (given a snail 'conception')", async acco
         })
     })
 
-    describe("Gen-1 Snails: Minted with stated parents", () => {
+    describe("Minted Gen-1 Snails: Check their state", () => {
 
         const conceptionAGen1 = {
             generation: 0,
